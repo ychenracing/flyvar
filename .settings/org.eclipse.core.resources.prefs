@@ -1,0 +1,10 @@
+eclipse.preferences.version=1
+encoding//src/main/resources/cn/edu/fudan/iipl/flyvar/cache/redis.properties=UTF-8
+encoding//src/main/resources/cn/edu/fudan/iipl/flyvar/db/jdbc.properties=UTF-8
+encoding//src/main/resources/cn/edu/fudan/iipl/flyvar/db/mongo.properties=UTF-8
+encoding//src/main/resources/cn/edu/fudan/iipl/flyvar/log/log4j.properties=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/common/navi.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/error/404.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/index.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/query/query.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/query/queryResult.jsp=UTF-8

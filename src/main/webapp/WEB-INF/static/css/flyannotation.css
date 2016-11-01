@@ -1,0 +1,109 @@
+body {
+	background: #fafafa repeat left top;
+}
+
+.error {
+	color: #ff0000;
+}
+
+.ft {
+	text-align: justify;
+	text-justify: inter-ideograph;
+}
+
+.fc {
+	text-align: center;
+}
+
+.dn {
+	display: none;
+}
+
+.width100 {
+	width: 100%;
+}
+
+.mtd5p {
+	margin: 5px auto;
+}
+
+.mtd10p {
+	margin: 10px auto;
+}
+
+.vertical-center {
+	vertical-align: middle !important;
+}
+
+.break-line {
+	word-break: break-all;
+	word-wrap: break-all;
+}
+
+@media all and (max-width : 768px) {
+	.pd90 {
+		padding-left: 0;
+		padding-right: 0;
+	}
+	.pd88 {
+		padding-left: 0;
+		padding-right: 0;
+	}
+	.pd80 {
+		padding-left: 0;
+		padding-right: 0;
+	}
+}
+
+@media all and (min-width : 768px) and (max-width : 991px) {
+	.pd90 {
+		padding-left: 5%;
+		padding-right: 5%;
+	}
+	.pd88 {
+		padding-left: 6%;
+		padding-right: 6%;
+	}
+	.pd80 {
+		padding-left: 10%;
+		padding-right: 10%;
+	}
+}
+
+@media all and (min-width : 992px) and (max-width : 1199px) {
+	.pd90 {
+		padding-left: 5%;
+		padding-right: 5%;
+	}
+	.pd88 {
+		padding-left: 6%;
+		padding-right: 6%;
+	}
+	.pd80 {
+		padding-left: 10%;
+		padding-right: 10%;
+	}
+}
+
+@media all and (min-width : 1200px) {
+	.pd90 {
+		padding-left: 5%;
+		padding-right: 5%;
+	}
+	.pd88 {
+		padding-left: 6%;
+		padding-right: 6%;
+	}
+	.pd80 {
+		padding-left: 10%;
+		padding-right: 10%;
+	}
+}
+
+a:link {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: none;
+}

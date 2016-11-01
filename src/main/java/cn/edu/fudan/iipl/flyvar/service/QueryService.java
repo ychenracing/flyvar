@@ -1,0 +1,49 @@
+/**
+ * ychen. Copyright (c) 2016年10月30日.
+ */
+package cn.edu.fudan.iipl.flyvar.service;
+
+import java.util.Collection;
+import java.util.List;
+
+import cn.edu.fudan.iipl.flyvar.model.QueryResultVariation;
+import cn.edu.fudan.iipl.flyvar.model.Variation;
+import cn.edu.fudan.iipl.flyvar.model.VariationRegion;
+import cn.edu.fudan.iipl.flyvar.model.constants.VariationDataBaseType;
+
+/**
+ * 
+ * @author racing
+ * @version $Id: QueryService.java, v 0.1 2016年10月30日 下午8:23:05 racing Exp $
+ */
+public interface QueryService {
+
+    /**
+     * Query by variation. Filter the variations who not exists in the variationDbType. If one
+     * choose variationDatabase which contains "DGRP", then query by variation should count SAMPLE
+     * NAME contains the variation.
+     * 
+     * @param variations
+     * @param variationDbType
+     * @return Filtered variations all of whom exist in the variationDbType. empty if variations are
+     *         all not existing in the variationDbType.
+     */
+    public List<QueryResultVariation> queryByVariation(Collection<Variation> variations,
+                                                       VariationDataBaseType variationDbType);
+
+    /**
+     * Query by region. Find all the variations who located in the region in variationDbType. If one
+     * choose variationDatabase which contains "DGRP", then query by variation should count SAMPLE
+     * NAME contains the variation.
+     * 
+     * @param regions
+     * @param variationDbType
+     * @return
+     */
+    public List<QueryResultVariation> queryByRegion(Collection<VariationRegion> regions,
+                                                    VariationDataBaseType variationDbType);
+
+    public List<QueryResultVariation> queryByGeneName(String geneName,
+                                                      VariationDataBaseType variationDbType);
+
+}
