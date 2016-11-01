@@ -43,55 +43,73 @@ public class QueryServiceImpl implements QueryService {
     @Autowired
     private CacheService  cacheService;
 
-    private String getExistsCacheKey(Variation variation) {
-        return Constants.CACHE_VARIATION_EXIST_IN_DB + variation.getChr() + "_" + variation.getPos()
-               + "_" + variation.getRef() + "_" + variation.getAlt();
+    private String getExistsCacheKey(Variation variation, String tableName) {
+        return Constants.CACHE_VARIATION_EXIST_IN_DB + "_" + tableName + "_" + variation.getChr()
+               + "_" + variation.getPos() + "_" + variation.getRef() + "_" + variation.getAlt();
     }
 
-    private String getSampleNameListCacheKey(Variation variation) {
-        return Constants.CACHE_COUNT_SAMPLE_NAME_CONTAINS_VARIATION + variation.getChr() + "_"
-               + variation.getPos() + "_" + variation.getRef() + "_" + variation.getAlt();
+    private String getSampleNameListCacheKey(Variation variation, String tableName) {
+        return Constants.CACHE_COUNT_SAMPLE_NAME_CONTAINS_VARIATION + "_" + tableName + "_"
+               + variation.getChr() + "_" + variation.getPos() + "_" + variation.getRef() + "_"
+               + variation.getAlt();
     }
 
-    private Boolean existsFromCache(Variation variation) {
-        return cacheService.get(getExistsCacheKey(variation));
+    private String getRegionVariationsCacheKey(VariationRegion region, String tableName) {
+        return Constants.CACHE_COUNT_SAMPLE_NAME_CONTAINS_VARIATION + "_" + tableName + "_"
+               + region.getChr() + "_" + region.getStartPos() + "_" + region.getEndPos();
     }
 
-    private List<String> getSampleNameListFromCache(Variation variation) {
-        return cacheService.get(getSampleNameListCacheKey(variation));
+    private Boolean existsFromCache(Variation variation, String tableName) {
+        return cacheService.get(getExistsCacheKey(variation, tableName));
     }
 
-    private void putExistsToCache(Variation variation, Boolean existsInCache) {
-        String key = getExistsCacheKey(variation);
+    private List<String> getSampleNameListFromCache(Variation variation, String tableName) {
+        return cacheService.get(getSampleNameListCacheKey(variation, tableName));
+    }
+
+    private List<Variation> getRegionVariationsFromCache(VariationRegion region, String tableName) {
+        return cacheService.get(getRegionVariationsCacheKey(region, tableName));
+    }
+
+    private void putExistsToCache(Variation variation, String tableName, Boolean existsInCache) {
+        String key = getExistsCacheKey(variation, tableName);
         cacheService.set(key, existsInCache);
     }
 
-    private void putSampleNameListToCache(Variation variation, List<String> sampleNameList) {
-        String key = getSampleNameListCacheKey(variation);
+    private void putSampleNameListToCache(Variation variation, String tableName,
+                                          List<String> sampleNameList) {
+        String key = getSampleNameListCacheKey(variation, tableName);
         cacheService.set(key, sampleNameList);
     }
 
-    /* 
-     * @see cn.edu.fudan.iipl.flyvar.service.QueryService#queryByVariation(java.util.Collection, 
+    private void putRegionVariationsToCache(VariationRegion region, List<Variation> variations,
+                                            String tableName) {
+        String key = getRegionVariationsCacheKey(region, tableName);
+        cacheService.set(key, variations);
+    }
+
+    /*
+     * @see cn.edu.fudan.iipl.flyvar.service.QueryService#queryByVariation(java.util.Collection,
      * cn.edu.fudan.iipl.flyvar.model.constants.VariationDataBaseType)
      */
     @Override
     public List<QueryResultVariation> queryByVariation(Collection<Variation> variations,
                                                        VariationDataBaseType variationDbType) {
         List<QueryResultVariation> result = variations.stream().filter(variation -> {
-            Boolean existsInCache = existsFromCache(variation);
+            Boolean existsInCache = existsFromCache(variation, variationDbType.getTableName());
             if (existsInCache == null) {
                 existsInCache = queryDao.existsInDb(variation, variationDbType);
-                putExistsToCache(variation, existsInCache);
+                putExistsToCache(variation, variationDbType.getTableName(), existsInCache);
             }
             return existsInCache.booleanValue();
         }).map(variation -> {
             QueryResultVariation resultVariation = new QueryResultVariation(variation.getChr(),
                 variation.getPos(), variation.getRef(), variation.getAlt());
-            List<String> sampleNameList = getSampleNameListFromCache(variation);
+            List<String> sampleNameList = getSampleNameListFromCache(variation,
+                variationDbType.getTableName());
             if (sampleNameList == null) {
                 sampleNameList = sampleNameDao.getSampleNamesContainTheVariation(variation);
-                putSampleNameListToCache(variation, sampleNameList);
+                putSampleNameListToCache(variation, variationDbType.getTableName(), sampleNameList);
             }
             if (EnumSet.of(VariationDataBaseType.DGRP, VariationDataBaseType.DGRP_HUGO_OTHER)
                 .contains(variationDbType)) {
@@ -102,16 +120,23 @@ public class QueryServiceImpl implements QueryService {
         return result == null ? Lists.newArrayList() : result;
     }
 
-    /* 
-     * @see cn.edu.fudan.iipl.flyvar.service.QueryService#queryByRegion(java.util.Collection, 
+    /*
+     * @see cn.edu.fudan.iipl.flyvar.service.QueryService#queryByRegion(java.util.Collection,
      * cn.edu.fudan.iipl.flyvar.model.constants.VariationDataBaseType)
      */
     @Override
     public List<QueryResultVariation> queryByRegion(Collection<VariationRegion> regions,
                                                     VariationDataBaseType variationDbType) {
-        Set<Variation> varSet = regions.stream()
-            .map(region -> queryDao.getVariationsByRegion(region, variationDbType))
-            .flatMap(varList -> varList.stream()).collect(Collectors.toSet());
+        Set<Variation> varSet = regions.stream().map(region -> {
+
+            List<Variation> variations = getRegionVariationsFromCache(region,
+                variationDbType.getTableName());
+            if (variations == null) {
+                variations = queryDao.getVariationsByRegion(region, variationDbType);
+                putRegionVariationsToCache(region, variations, variationDbType.getTableName());
+            }
+            return variations;
+        }).flatMap(varList -> varList.stream()).collect(Collectors.toSet());
         if (CollectionUtils.isEmpty(varSet)) {
             return Lists.newArrayList();
         }
@@ -119,12 +144,23 @@ public class QueryServiceImpl implements QueryService {
     }
 
     /**
-     * @see cn.edu.fudan.iipl.flyvar.service.QueryService#queryByGeneName(java.lang.String,
+     * @see cn.edu.fudan.iipl.flyvar.service.QueryService#queryByGeneNameWholeRegion(java.util.Collection,
      *      cn.edu.fudan.iipl.flyvar.model.constants.VariationDataBaseType)
      */
     @Override
-    public List<QueryResultVariation> queryByGeneName(String geneName,
-                                                      VariationDataBaseType variationDbType) {
+    public List<QueryResultVariation> queryByGeneNameWholeRegion(Collection<String> geneNames,
+                                                                 VariationDataBaseType variationDbType) {
+
+        return null;
+    }
+
+    /**
+     * @see cn.edu.fudan.iipl.flyvar.service.QueryService#queryByGeneNameExonRegion(java.util.Collection,
+     *      cn.edu.fudan.iipl.flyvar.model.constants.VariationDataBaseType)
+     */
+    @Override
+    public List<QueryResultVariation> queryByGeneNameExonRegion(Collection<String> geneNames,
+                                                                VariationDataBaseType variationDbType) {
         return null;
     }
 

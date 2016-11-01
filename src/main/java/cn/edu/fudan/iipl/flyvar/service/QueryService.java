@@ -43,7 +43,28 @@ public interface QueryService {
     public List<QueryResultVariation> queryByRegion(Collection<VariationRegion> regions,
                                                     VariationDataBaseType variationDbType);
 
-    public List<QueryResultVariation> queryByGeneName(String geneName,
-                                                      VariationDataBaseType variationDbType);
+    /**
+     * Query by geneName Whole region. Find all the variations who located in the whole regions of
+     * geneNames in variationDbType. If one choose variationDatabase which contains "DGRP", then
+     * query by variation should count SAMPLE NAME contains the variation.
+     * 
+     * @param geneNames
+     * @param variationDbType
+     * @return
+     */
+    public List<QueryResultVariation> queryByGeneNameWholeRegion(Collection<String> geneNames,
+                                                                 VariationDataBaseType variationDbType);
+
+    /**
+     * Query by geneName Exon region. Find all the variations who located in the exon regions of
+     * geneNames in variationDbType. If one choose variationDatabase which contains "DGRP", then
+     * query by variation should count SAMPLE NAME contains the variation.
+     * 
+     * @param geneNames
+     * @param variationDbType
+     * @return
+     */
+    public List<QueryResultVariation> queryByGeneNameExonRegion(Collection<String> geneNames,
+                                                                VariationDataBaseType variationDbType);
 
 }

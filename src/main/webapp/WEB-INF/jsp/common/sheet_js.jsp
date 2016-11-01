@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="static/css/font-awesome.min.css" />
 <link rel="stylesheet" href="static/css/fileinput.css" media="all"
 	type="text/css" />
-<script src="static/js/jquery-2.1.0.js"></script>
+<script src="static/js/jquery-2.2.4.js"></script>
 <script src="static/js/plugins/canvas-to-blob.js" type="text/javascript"></script>
 <script src="static/js/plugins/sortable.js" type="text/javascript"></script>
 <script src="static/js/plugins/purify.js" type="text/javascript"></script>
