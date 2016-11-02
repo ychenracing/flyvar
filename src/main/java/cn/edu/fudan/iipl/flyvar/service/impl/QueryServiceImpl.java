@@ -55,8 +55,16 @@ public class QueryServiceImpl implements QueryService {
     }
 
     private String getRegionVariationsCacheKey(VariationRegion region, String tableName) {
-        return Constants.CACHE_COUNT_SAMPLE_NAME_CONTAINS_VARIATION + "_" + tableName + "_"
-               + region.getChr() + "_" + region.getStartPos() + "_" + region.getEndPos();
+        return Constants.CACHE_REGION_VARIATIONS + "_" + tableName + "_" + region.getChr() + "_"
+               + region.getStartPos() + "_" + region.getEndPos();
+    }
+
+    private String getGeneNameWholeVariationsCacheKey(String geneName, String tableName) {
+        return Constants.CACHE_GENE_NAME_WHOLE_VARIATIONS + "_" + tableName + "_" + geneName;
+    }
+
+    private String getGeneNameExonVariationsCacheKey(String geneName, String tableName) {
+        return Constants.CACHE_GENE_NAME_EXON_VARIATIONS + "_" + tableName + "_" + geneName;
     }
 
     private Boolean existsFromCache(Variation variation, String tableName) {
@@ -69,6 +77,14 @@ public class QueryServiceImpl implements QueryService {
 
     private List<Variation> getRegionVariationsFromCache(VariationRegion region, String tableName) {
         return cacheService.get(getRegionVariationsCacheKey(region, tableName));
+    }
+
+    private List<Variation> getGeneNameWholeVariationsFromCache(String geneName, String tableName) {
+        return cacheService.get(getGeneNameWholeVariationsCacheKey(geneName, tableName));
+    }
+
+    private List<Variation> getGeneNameExonVariationsFromCache(String geneName, String tableName) {
+        return cacheService.get(getGeneNameExonVariationsCacheKey(geneName, tableName));
     }
 
     private void putExistsToCache(Variation variation, String tableName, Boolean existsInCache) {
@@ -85,6 +101,18 @@ public class QueryServiceImpl implements QueryService {
     private void putRegionVariationsToCache(VariationRegion region, List<Variation> variations,
                                             String tableName) {
         String key = getRegionVariationsCacheKey(region, tableName);
+        cacheService.set(key, variations);
+    }
+
+    private void putGeneNameWholeVariationsToCache(String geneName, List<Variation> variations,
+                                                   String tableName) {
+        String key = getGeneNameWholeVariationsCacheKey(geneName, tableName);
+        cacheService.set(key, variations);
+    }
+
+    private void putGeneNameExonVariationsToCache(String geneName, List<Variation> variations,
+                                                  String tableName) {
+        String key = getGeneNameExonVariationsCacheKey(geneName, tableName);
         cacheService.set(key, variations);
     }
 
@@ -128,7 +156,6 @@ public class QueryServiceImpl implements QueryService {
     public List<QueryResultVariation> queryByRegion(Collection<VariationRegion> regions,
                                                     VariationDataBaseType variationDbType) {
         Set<Variation> varSet = regions.stream().map(region -> {
-
             List<Variation> variations = getRegionVariationsFromCache(region,
                 variationDbType.getTableName());
             if (variations == null) {
@@ -150,7 +177,9 @@ public class QueryServiceImpl implements QueryService {
     @Override
     public List<QueryResultVariation> queryByGeneNameWholeRegion(Collection<String> geneNames,
                                                                  VariationDataBaseType variationDbType) {
-
+        geneNames.stream().map(geneName -> {
+            List<Variation> variations = getGeneNameWholeVariationsFromCache(geneName, variationDbType.getTableName());
+        })
         return null;
     }
 

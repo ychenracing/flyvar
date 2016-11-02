@@ -12,9 +12,15 @@ public class Constants {
     public static final String CACHE_VARIATION_EXIST_IN_DB                = "CACHE_VARIATION_EXIST_IN_DB_";
 
     /** 多少sample name中有该有该variation的缓存key */
-    public static final String CACHE_COUNT_SAMPLE_NAME_CONTAINS_VARIATION = "CACHE_COUNT_SAMPLE_NAME_CONTAINS_VARIATION_";
+    public static final String CACHE_COUNT_SAMPLE_NAME_CONTAINS_VARIATION = "CACHE_QUERY_COUNT_SAMPLE_NAME_CONTAINS_VARIATION_";
 
     /** region对应的那些variations的缓存key */
-    public static final String CACHE_REGION_VARIATIONS                    = "CACHE_REGION_VARIATIONS_";
+    public static final String CACHE_REGION_VARIATIONS                    = "CACHE_QUERY_REGION_VARIATIONS_";
+
+    /** whole region的gene name对应的那些variations的缓存key */
+    public static final String CACHE_GENE_NAME_WHOLE_VARIATIONS           = "CACHE_GENE_NAME_WHOLE_REGION_VARIATIONS_";
+
+    /** exon region的gene name对应的那些variations的缓存key */
+    public static final String CACHE_GENE_NAME_EXON_VARIATIONS            = "CACHE_GENE_NAME_EXON_REGION_VARIATIONS_";
 
 }
