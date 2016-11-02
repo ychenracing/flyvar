@@ -1,7 +1,0 @@
-<ehcache>
-	<diskStore path="java.io.tmpdir" />
-	<defaultCache maxElementsInMemory="500" eternal="false"
-		timeToIdleSeconds="300" timeToLiveSeconds="1200" overflowToDisk="true" />
-	<cache name="iipl.flyvar" maxElementsInMemory="150" eternal="false"
-		timeToLiveSeconds="36000" timeToIdleSeconds="3600" overflowToDisk="true" />
-</ehcache>  
