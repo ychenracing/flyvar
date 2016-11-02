@@ -3,6 +3,7 @@
  */
 package cn.edu.fudan.iipl.flyvar.model;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -18,15 +19,17 @@ import com.google.common.collect.Sets;
  * @author racing
  * @version $Id: Variation.java, v 0.1 2016年10月29日 下午11:13:19 racing Exp $
  */
-public class Variation implements Comparable<Variation> {
+public class Variation implements Comparable<Variation>, Serializable {
 
-    private String  chr;
-    private long    pos;
-    private String  ref;
-    private String  alt;
-    private int     count;
-    private boolean existsInVariationDb;
-    private String  annotation;
+    private static final long serialVersionUID = -2994031807739119861L;
+
+    private String            chr;
+    private long              pos;
+    private String            ref;
+    private String            alt;
+    private int               count;
+    private boolean           existsInVariationDb;
+    private String            annotation;
 
     public Variation() {
     }

@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -76,7 +77,7 @@ public class QueryDao {
                 variation.setExistsInVariationDb(true);
                 return variation;
             }
-        }, compatibleChr.left, compatibleChr.right, region.getStartPos(), region.getEndPos());
+        }, compatibleChr.left, compatibleChr.right, region.getStart(), region.getEnd());
         return result == null ? Lists.newArrayList() : result;
     }
 
@@ -90,8 +91,8 @@ public class QueryDao {
     public List<String> getFlybaseIdByAnnotationSymbol(Collection<String> annotationSymbols) {
         if (CollectionUtils.isEmpty(annotationSymbols))
             return Lists.newArrayList();
-        String sql = "select flybase_id from " + FLYBASE_ID_TABLE + " where submitted_id in ("
-                     + StringUtils.join(annotationSymbols, ",") + ")";
+        String sql = "select flybase_id from " + FLYBASE_ID_TABLE + " where submitted_id in (\""
+                     + StringUtils.join(annotationSymbols, "\", \"") + "\")";
         List<String> result = flyvarJdbcTemplate.queryForList(sql, String.class);
         return result == null ? Lists.newArrayList() : result;
     }
@@ -106,8 +107,8 @@ public class QueryDao {
     public List<String> getFlybaseIdBySymbol(Collection<String> symbols) {
         if (CollectionUtils.isEmpty(symbols))
             return Lists.newArrayList();
-        String sql = "select flybase_id from " + FLYBASE_ID_TABLE + " where symbol in ("
-                     + StringUtils.join(symbols, ",") + ")";
+        String sql = "select flybase_id from " + FLYBASE_ID_TABLE + " where symbol in (\""
+                     + StringUtils.join(symbols, "\", \"") + "\")";
         List<String> result = flyvarJdbcTemplate.queryForList(sql, String.class);
         return result == null ? Lists.newArrayList() : result;
     }
@@ -115,9 +116,10 @@ public class QueryDao {
     public List<VariationRegion> getVariationRegionWholeRegion(Collection<String> geneNames) {
         if (CollectionUtils.isEmpty(geneNames))
             return Lists.newArrayList();
-        String sql = "select chr, start, end from " + GENENAME_TABLE + " where genename in ("
-                     + StringUtils.join(geneNames, ",") + ")";
-        List<VariationRegion> result = flyvarJdbcTemplate.queryForList(sql, VariationRegion.class);
+        String sql = "select chr, start, end from " + GENENAME_TABLE + " where genename in (\""
+                     + StringUtils.join(geneNames, "\", \"") + "\")";
+        List<VariationRegion> result = flyvarJdbcTemplate.query(sql,
+            new BeanPropertyRowMapper<VariationRegion>(VariationRegion.class));
         return result == null ? Lists.newArrayList() : result;
     }
 
@@ -125,7 +127,7 @@ public class QueryDao {
         if (CollectionUtils.isEmpty(geneNames))
             return Lists.newArrayList();
         String sql = "select chr, sumexonstart, sumexonend from " + GENENAME_TABLE
-                     + " where genename in (" + StringUtils.join(geneNames, ",") + ")";
+                     + " where genename in (\"" + StringUtils.join(geneNames, "\", \"") + "\")";
         List<VariationRegion> result = flyvarJdbcTemplate
             .query(sql, new RowMapper<List<VariationRegion>>() {
                 @Override
@@ -150,8 +152,8 @@ public class QueryDao {
     public List<String> getGeneNamesByFlybaseId(Collection<String> flybaseIds) {
         if (CollectionUtils.isEmpty(flybaseIds))
             return Lists.newArrayList();
-        String sql = "select distinct fbtr from " + GENENAME_FLYBASE_ID_TABLE + " where fbgn in ("
-                     + StringUtils.join(flybaseIds, ",") + ")";
+        String sql = "select distinct fbtr from " + GENENAME_FLYBASE_ID_TABLE + " where fbgn in (\""
+                     + StringUtils.join(flybaseIds, "\", \"") + "\")";
         List<String> result = flyvarJdbcTemplate.queryForList(sql, String.class);
         return result == null ? Lists.newArrayList() : result;
     }

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -21,6 +23,7 @@ import cn.edu.fudan.iipl.flyvar.model.QueryResultVariation;
 import cn.edu.fudan.iipl.flyvar.model.Variation;
 import cn.edu.fudan.iipl.flyvar.model.VariationRegion;
 import cn.edu.fudan.iipl.flyvar.model.constants.Constants;
+import cn.edu.fudan.iipl.flyvar.model.constants.GeneNameType;
 import cn.edu.fudan.iipl.flyvar.model.constants.VariationDataBaseType;
 import cn.edu.fudan.iipl.flyvar.service.CacheService;
 import cn.edu.fudan.iipl.flyvar.service.QueryService;
@@ -34,37 +37,39 @@ import cn.edu.fudan.iipl.flyvar.service.QueryService;
 @Service
 public class QueryServiceImpl implements QueryService {
 
-    @Autowired
-    private QueryDao      queryDao;
+    private static final Logger logger = LoggerFactory.getLogger(QueryServiceImpl.class);
 
     @Autowired
-    private SampleNameDao sampleNameDao;
+    private QueryDao            queryDao;
 
     @Autowired
-    private CacheService  cacheService;
+    private SampleNameDao       sampleNameDao;
+
+    @Autowired
+    private CacheService        cacheService;
 
     private String getExistsCacheKey(Variation variation, String tableName) {
-        return Constants.CACHE_VARIATION_EXIST_IN_DB + "_" + tableName + "_" + variation.getChr()
-               + "_" + variation.getPos() + "_" + variation.getRef() + "_" + variation.getAlt();
+        return Constants.CACHE_VARIATION_EXIST_IN_DB + tableName + "_" + variation.getChr() + "_"
+               + variation.getPos() + "_" + variation.getRef() + "_" + variation.getAlt();
     }
 
     private String getSampleNameListCacheKey(Variation variation, String tableName) {
-        return Constants.CACHE_COUNT_SAMPLE_NAME_CONTAINS_VARIATION + "_" + tableName + "_"
+        return Constants.CACHE_COUNT_SAMPLE_NAME_CONTAINS_VARIATION + tableName + "_"
                + variation.getChr() + "_" + variation.getPos() + "_" + variation.getRef() + "_"
                + variation.getAlt();
     }
 
     private String getRegionVariationsCacheKey(VariationRegion region, String tableName) {
-        return Constants.CACHE_REGION_VARIATIONS + "_" + tableName + "_" + region.getChr() + "_"
-               + region.getStartPos() + "_" + region.getEndPos();
+        return Constants.CACHE_REGION_VARIATIONS + tableName + "_" + region.getChr() + "_"
+               + region.getStart() + "_" + region.getEnd();
     }
 
-    private String getGeneNameWholeVariationsCacheKey(String geneName, String tableName) {
-        return Constants.CACHE_GENE_NAME_WHOLE_VARIATIONS + "_" + tableName + "_" + geneName;
+    private String getGeneNameWholeVariationRegionsCacheKey(String geneName, String tableName) {
+        return Constants.CACHE_GENE_NAME_WHOLE_VARIATION_REGIONS + tableName + "_" + geneName;
     }
 
-    private String getGeneNameExonVariationsCacheKey(String geneName, String tableName) {
-        return Constants.CACHE_GENE_NAME_EXON_VARIATIONS + "_" + tableName + "_" + geneName;
+    private String getGeneNameExonVariationRegionsCacheKey(String geneName, String tableName) {
+        return Constants.CACHE_GENE_NAME_EXON_VARIATION_REGIONS + tableName + "_" + geneName;
     }
 
     private Boolean existsFromCache(Variation variation, String tableName) {
@@ -79,12 +84,14 @@ public class QueryServiceImpl implements QueryService {
         return cacheService.get(getRegionVariationsCacheKey(region, tableName));
     }
 
-    private List<Variation> getGeneNameWholeVariationsFromCache(String geneName, String tableName) {
-        return cacheService.get(getGeneNameWholeVariationsCacheKey(geneName, tableName));
+    private List<VariationRegion> getGeneNameWholeVariationRegionsFromCache(String geneName,
+                                                                            String tableName) {
+        return cacheService.get(getGeneNameWholeVariationRegionsCacheKey(geneName, tableName));
     }
 
-    private List<Variation> getGeneNameExonVariationsFromCache(String geneName, String tableName) {
-        return cacheService.get(getGeneNameExonVariationsCacheKey(geneName, tableName));
+    private List<VariationRegion> getGeneNameExonVariationRegionsFromCache(String geneName,
+                                                                           String tableName) {
+        return cacheService.get(getGeneNameExonVariationRegionsCacheKey(geneName, tableName));
     }
 
     private void putExistsToCache(Variation variation, String tableName, Boolean existsInCache) {
@@ -104,15 +111,17 @@ public class QueryServiceImpl implements QueryService {
         cacheService.set(key, variations);
     }
 
-    private void putGeneNameWholeVariationsToCache(String geneName, List<Variation> variations,
-                                                   String tableName) {
-        String key = getGeneNameWholeVariationsCacheKey(geneName, tableName);
-        cacheService.set(key, variations);
+    private void putGeneNameWholeVariationRegionsToCache(String geneName,
+                                                         List<VariationRegion> variationRegions,
+                                                         String tableName) {
+        String key = getGeneNameWholeVariationRegionsCacheKey(geneName, tableName);
+        cacheService.set(key, variationRegions);
     }
 
-    private void putGeneNameExonVariationsToCache(String geneName, List<Variation> variations,
-                                                  String tableName) {
-        String key = getGeneNameExonVariationsCacheKey(geneName, tableName);
+    private void putGeneNameExonVariationRegionsToCache(String geneName,
+                                                        List<VariationRegion> variations,
+                                                        String tableName) {
+        String key = getGeneNameExonVariationRegionsCacheKey(geneName, tableName);
         cacheService.set(key, variations);
     }
 
@@ -177,10 +186,37 @@ public class QueryServiceImpl implements QueryService {
     @Override
     public List<QueryResultVariation> queryByGeneNameWholeRegion(Collection<String> geneNames,
                                                                  VariationDataBaseType variationDbType) {
-        geneNames.stream().map(geneName -> {
-            List<Variation> variations = getGeneNameWholeVariationsFromCache(geneName, variationDbType.getTableName());
-        })
-        return null;
+        logger.info("query by gene name for whole region: geneNames = {}, table = {}", geneNames,
+            variationDbType.getTableName());
+        List<QueryResultVariation> result = geneNames.stream().map(geneName -> {
+            List<VariationRegion> variationRegions = getGeneNameWholeVariationRegionsFromCache(
+                geneName, variationDbType.getTableName());
+            if (variationRegions == null) {
+                GeneNameType geneNameType = GeneNameType.of(geneName);
+                if (geneNameType == null) {
+                    return null;
+                }
+                List<String> flybaseIds = Lists.newArrayList();
+                switch (geneNameType) {
+                    case FLYBASE_ID:
+                        flybaseIds.add(geneName);
+                        break;
+                    case ANNOTATION_SYMBOL:
+                        flybaseIds = queryDao
+                            .getFlybaseIdByAnnotationSymbol(Lists.newArrayList(geneName));
+                        break;
+                    case SYMBOL:
+                        flybaseIds = queryDao.getFlybaseIdBySymbol(Lists.newArrayList(geneName));
+                        break;
+                }
+                List<String> realGeneNames = queryDao.getGeneNamesByFlybaseId(flybaseIds);
+                variationRegions = queryDao.getVariationRegionWholeRegion(realGeneNames);
+                putGeneNameWholeVariationRegionsToCache(geneName, variationRegions,
+                    variationDbType.getTableName());
+            }
+            return queryByRegion(variationRegions, variationDbType);
+        }).flatMap(resultVariations -> resultVariations.stream()).collect(Collectors.toList());
+        return result == null ? Lists.newArrayList() : result;
     }
 
     /**
@@ -190,7 +226,37 @@ public class QueryServiceImpl implements QueryService {
     @Override
     public List<QueryResultVariation> queryByGeneNameExonRegion(Collection<String> geneNames,
                                                                 VariationDataBaseType variationDbType) {
-        return null;
+        logger.info("query by gene name for exon region: geneNames = {}, table = {}", geneNames,
+            variationDbType.getTableName());
+        List<QueryResultVariation> result = geneNames.stream().map(geneName -> {
+            List<VariationRegion> variationRegions = getGeneNameExonVariationRegionsFromCache(
+                geneName, variationDbType.getTableName());
+            if (variationRegions == null) {
+                GeneNameType geneNameType = GeneNameType.of(geneName);
+                if (geneNameType == null) {
+                    return null;
+                }
+                List<String> flybaseIds = Lists.newArrayList();
+                switch (geneNameType) {
+                    case FLYBASE_ID:
+                        flybaseIds.add(geneName);
+                        break;
+                    case ANNOTATION_SYMBOL:
+                        flybaseIds = queryDao
+                            .getFlybaseIdByAnnotationSymbol(Lists.newArrayList(geneName));
+                        break;
+                    case SYMBOL:
+                        flybaseIds = queryDao.getFlybaseIdBySymbol(Lists.newArrayList(geneName));
+                        break;
+                }
+                List<String> realGeneNames = queryDao.getGeneNamesByFlybaseId(flybaseIds);
+                variationRegions = queryDao.getVariationRegionExonRegion(realGeneNames);
+                putGeneNameExonVariationRegionsToCache(geneName, variationRegions,
+                    variationDbType.getTableName());
+            }
+            return queryByRegion(variationRegions, variationDbType);
+        }).flatMap(resultVariations -> resultVariations.stream()).collect(Collectors.toList());
+        return result == null ? Lists.newArrayList() : result;
     }
 
 }

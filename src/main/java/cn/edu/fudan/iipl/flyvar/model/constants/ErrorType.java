@@ -1,7 +1,7 @@
 package cn.edu.fudan.iipl.flyvar.model.constants;
 
 
-public enum ErrorEnum {
+public enum ErrorType {
 
 	PAGE_NOT_FOUND(404, "page not found"),
 	NOT_SUPPORTED(405, "method not supported"),
@@ -12,7 +12,7 @@ public enum ErrorEnum {
 
 	private String msg;
 
-	ErrorEnum(Integer code, String msg) {
+	ErrorType(Integer code, String msg) {
 		this.code = code;
 		this.msg = msg;
 	}

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.google.common.collect.Maps;
 
 import cn.edu.fudan.iipl.flyvar.AbstractController;
-import cn.edu.fudan.iipl.flyvar.model.constants.ErrorEnum;
+import cn.edu.fudan.iipl.flyvar.model.constants.ErrorType;
 
 /**
  * Controller异常处理
@@ -43,8 +43,8 @@ public class FlyvarControllerAdvice extends AbstractController {
                                                       HttpServletResponse response) {
         logger.warn(getClientIP(request) + " " + error.getMessage());
         Map<String, Object> map = Maps.newHashMap();
-        map.put("code", ErrorEnum.INVALID_ACCESS.getCode());
-        map.put("message", ErrorEnum.INVALID_ACCESS.getMsg());
+        map.put("code", ErrorType.INVALID_ACCESS.getCode());
+        map.put("message", ErrorType.INVALID_ACCESS.getMsg());
         return map;
     }
 
@@ -56,8 +56,8 @@ public class FlyvarControllerAdvice extends AbstractController {
                                                          HttpServletResponse response) {
         logger.info(getClientIP(request) + " " + error.getMessage());
         Map<String, Object> map = Maps.newHashMap();
-        map.put("code", ErrorEnum.NOT_SUPPORTED.getCode());
-        map.put("message", ErrorEnum.NOT_SUPPORTED.getMsg());
+        map.put("code", ErrorType.NOT_SUPPORTED.getCode());
+        map.put("message", ErrorType.NOT_SUPPORTED.getMsg());
         return map;
     }
 
@@ -66,10 +66,10 @@ public class FlyvarControllerAdvice extends AbstractController {
     @ResponseBody
     public Map<String, Object> processException(Exception error, HttpServletRequest request,
                                                 HttpServletResponse response) {
-        logger.error(ErrorEnum.SYSTEM_ERROR.getMsg(), error);
+        logger.error(ErrorType.SYSTEM_ERROR.getMsg(), error);
         Map<String, Object> map = Maps.newHashMap();
-        map.put("code", ErrorEnum.SYSTEM_ERROR.getCode());
-        map.put("message", ErrorEnum.SYSTEM_ERROR.getMsg());
+        map.put("code", ErrorType.SYSTEM_ERROR.getCode());
+        map.put("message", ErrorType.SYSTEM_ERROR.getMsg());
         return map;
     }
 }

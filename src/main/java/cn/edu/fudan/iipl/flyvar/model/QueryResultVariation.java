@@ -3,17 +3,22 @@
  */
 package cn.edu.fudan.iipl.flyvar.model;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author racing
  * @version $Id: QueryResultVariation.java, v 0.1 2016年10月30日 下午3:49:06 racing Exp $
  */
-public class QueryResultVariation {
-    private String  chr;
-    private long    pos;
-    private String  ref;
-    private String  alt;
-    private Integer count;
+public class QueryResultVariation implements Serializable {
+
+    private static final long serialVersionUID = -8775523339995696046L;
+
+    private String            chr;
+    private long              pos;
+    private String            ref;
+    private String            alt;
+    private Integer           count;
 
     public QueryResultVariation() {
     }

@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import cn.edu.fudan.iipl.flyvar.AbstractController;
@@ -83,7 +84,7 @@ public class QueryController extends AbstractController {
     @RequestMapping(value = { "/query/query.htm" }, method = { RequestMethod.POST })
     public String doQuery(HttpServletRequest request, @Valid QueryForm queryForm,
                           BindingResult bindings, MultipartFile queryFile,
-                          RedirectAttributes model) {
+                          RedirectAttributes redirectModel, Model model) {
         checkReferer(request);
         boolean correctParams = validateQueryParams(request, queryForm, bindings, queryFile, model);
         if (!correctParams) {
@@ -111,8 +112,8 @@ public class QueryController extends AbstractController {
             }
             List<QueryResultVariation> queryResult = queryService.queryByVariation(variations,
                 VariationDataBaseType.of(queryForm.getVariationDb()));
-            model.addFlashAttribute("queryResults", queryResult);
-            model.addFlashAttribute("queryType", queryForm.getVariationDb());
+            redirectModel.addFlashAttribute("queryResults", queryResult);
+            redirectModel.addFlashAttribute("queryType", queryForm.getVariationDb());
             return "redirect:/queryResult.htm";
         } else if (QueryType.SAMPLE == queryType) {
 
@@ -137,13 +138,56 @@ public class QueryController extends AbstractController {
             }
             List<QueryResultVariation> queryResult = queryService.queryByRegion(regions,
                 VariationDataBaseType.of(queryForm.getVariationDb()));
-            model.addFlashAttribute("queryResults", queryResult);
-            model.addFlashAttribute("queryType", queryForm.getVariationDb());
+            redirectModel.addFlashAttribute("queryResults", queryResult);
+            redirectModel.addFlashAttribute("queryType", queryForm.getVariationDb());
             return "redirect:/queryResult.htm";
         } else if (QueryType.GENE_WHOLE == queryType) {
-
+            String variationStr = queryForm.getQueryInput();
+            if (StringUtils.isBlank(queryForm.getQueryInput())) {
+                try {
+                    variationStr = FileUtils
+                        .readFileToString(saveFileAndGetFilePath(queryFile).toFile(), "utf-8");
+                } catch (IOException e) {
+                    logger.error("read file error! queryFile=" + queryFile, e);
+                }
+            }
+            if (StringUtils.isBlank(variationStr)) {
+                model.addAttribute("queryForm", queryForm);
+                bindings.rejectValue("queryInput", "error.queryInputFormat");
+                logger.info("error submit! error format for variation input or file: queryForm={}",
+                    queryForm);
+                return QUERY_JSP;
+            }
+            List<String> geneNames = Lists.newArrayList(variationStr.split("\\s+"));
+            List<QueryResultVariation> queryResult = queryService.queryByGeneNameWholeRegion(
+                geneNames, VariationDataBaseType.of(queryForm.getVariationDb()));
+            redirectModel.addFlashAttribute("queryResults", queryResult);
+            redirectModel.addFlashAttribute("queryType", queryForm.getVariationDb());
+            return "redirect:/queryResult.htm";
+        } else if (QueryType.GENE_EXON == queryType) {
+            String variationStr = queryForm.getQueryInput();
+            if (StringUtils.isBlank(queryForm.getQueryInput())) {
+                try {
+                    variationStr = FileUtils
+                        .readFileToString(saveFileAndGetFilePath(queryFile).toFile(), "utf-8");
+                } catch (IOException e) {
+                    logger.error("read file error! queryFile=" + queryFile, e);
+                }
+            }
+            if (StringUtils.isBlank(variationStr)) {
+                model.addAttribute("queryForm", queryForm);
+                bindings.rejectValue("queryInput", "error.queryInputFormat");
+                logger.info("error submit! error format for variation input or file: queryForm={}",
+                    queryForm);
+                return QUERY_JSP;
+            }
+            List<String> geneNames = Lists.newArrayList(variationStr.split("\\s+"));
+            List<QueryResultVariation> queryResult = queryService.queryByGeneNameExonRegion(
+                geneNames, VariationDataBaseType.of(queryForm.getVariationDb()));
+            redirectModel.addFlashAttribute("queryResults", queryResult);
+            redirectModel.addFlashAttribute("queryType", queryForm.getVariationDb());
+            return "redirect:/queryResult.htm";
         }
-
         return null;
     }
 
@@ -224,6 +268,7 @@ public class QueryController extends AbstractController {
                 logger.info("error submit! queryEmail is empty: queryForm={}", queryForm);
                 return false;
             }
+            return true;
         }
 
         if (StringUtils.isBlank(queryForm.getQueryInput()) && queryFile.isEmpty()) {

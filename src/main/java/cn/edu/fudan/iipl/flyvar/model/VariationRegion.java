@@ -3,6 +3,7 @@
  */
 package cn.edu.fudan.iipl.flyvar.model;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -18,20 +19,22 @@ import com.google.common.collect.Sets;
  * @author racing
  * @version $Id: VariationRegion.java, v 0.1 2016年11月1日 上午8:21:55 racing Exp $
  */
-public class VariationRegion {
+public class VariationRegion implements Serializable {
 
-    private String chr;
-    private long   startPos;
-    private long   endPos;
+    private static final long serialVersionUID = 5002960678331634122L;
+
+    private String            chr;
+    private long              start;
+    private long              end;
 
     public VariationRegion() {
 
     }
 
-    public VariationRegion(String chr, long startPos, long endPos) {
+    public VariationRegion(String chr, long start, long end) {
         this.chr = chr;
-        this.startPos = startPos;
-        this.endPos = endPos;
+        this.start = start;
+        this.end = end;
     }
 
     public String getChr() {
@@ -57,20 +60,20 @@ public class VariationRegion {
         return result;
     }
 
-    public long getStartPos() {
-        return startPos;
+    public long getStart() {
+        return start;
     }
 
-    public void setStartPos(long startPos) {
-        this.startPos = startPos;
+    public void setStart(long start) {
+        this.start = start;
     }
 
-    public long getEndPos() {
-        return endPos;
+    public long getEnd() {
+        return end;
     }
 
-    public void setEndPos(long endPos) {
-        this.endPos = endPos;
+    public void setEnd(long end) {
+        this.end = end;
     }
 
     /**

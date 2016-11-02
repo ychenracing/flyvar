@@ -5,15 +5,20 @@
 	$(document).on('click', '#query', function() {
 		waitingDialog.show();
 		$("#queryForm").attr("action", "query/query.htm");
+		disableVariationDb(false);
 		$("#queryForm").submit();
 	});
 	$(document).on('click', '#query_and_annotate', function() {
 		waitingDialog.show();
 		$("#queryForm").attr("action", "query/queryAnnotate.htm");
+		disableVariationDb(false);
 		$("#queryForm").submit();
 	});
 })();
 
+function disableVariationDb(disable) {
+	$('input:radio[name="variationDb"]').prop("disabled", disable);
+}
 
 function getDgrpSamples() {
 	$.ajax({
@@ -44,9 +49,9 @@ function setVariationDb() {
 
 	if (queryType === "2") {
 		$("#db_dgrp").prop("checked", true);
-		$('input:radio[name="variationDb"]').prop("disabled", true);
+		disableVariationDb(true);
 	} else {
-		$('input:radio[name="variationDb"]').prop("disabled", false);
+		disableVariationDb(false);
 	}
 }
 

@@ -10,15 +10,15 @@ package cn.edu.fudan.iipl.flyvar.model.constants;
  */
 public enum VariationDataBaseType {
 
-                                   DGRP(1, "DGRP",
-                                        "freeze2_vcf_summary_205_flies"), HUGO(2, "EMS screening",
-                                                                               "all_hugo_snps_final_merged_vcf_summary_1homo4hetero"), OTHER_PUBLIC(3,
-                                                                                                                                                    "Other public databases",
-                                                                                                                                                    "fly_public"), DGRP_HUGO_OTHER(4,
-                                                                                                                                                                                   "DGRP + EMS screening + Other public databases",
-                                                                                                                                                                                   "dgrp_and_hugo");
+    DGRP(1, "DGRP", "freeze2_vcf_summary_205_flies"), 
+    HUGO(2, "EMS screening", "all_hugo_snps_final_merged_vcf_summary_1homo4hetero"), 
+    OTHER_PUBLIC(3, "Other public databases", "fly_public"), 
+    DGRP_HUGO_OTHER(4, "DGRP + EMS screening + Other public databases", "dgrp_and_hugo");
+    
     private int    code;
+    
     private String desc;
+    
     private String tableName;
 
     VariationDataBaseType(int code, String desc, String tableName) {

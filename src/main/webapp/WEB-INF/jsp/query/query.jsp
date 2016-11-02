@@ -33,24 +33,23 @@
 		</div>
 
 		<div class="row mtd10p pd90">
-			<form:form id="queryForm" role="form" commandName="queryForm" method="post"
-				action="${basePath}query/query.htm" enctype="multipart/form-data">
+			<form:form id="queryForm" role="form" commandName="queryForm"
+				method="post" action="${basePath}query/query.htm"
+				enctype="multipart/form-data">
 				<div class="row">
 					<div
 						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left vertical-center">choose
 						database</div>
 					<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right">
-						<label class="radio"> <form:radiobutton
+						<label class="radio"> <form:radiobutton id="db_dgrp"
 								path="variationDb" value="1" checked="checked" /> DGRP
-						</label> <label class="radio"> <form:radiobutton
+						</label> <label class="radio"> <form:radiobutton id="db_hugo"
 								path="variationDb" value="2" />EMS screening
+						</label> <label class="radio"> <form:radiobutton id="db_other"
+								path="variationDb" value="3" />Other public databases
 						</label> <label class="radio"> <form:radiobutton
-								path="variationDb" value="3" />Other public
-							databases
-						</label> <label class="radio"> <form:radiobutton
-								id="db_dgrp_hugo_other" path="variationDb"
-								value="4" />DGRP + EMS screening + Other public
-							databases
+								id="db_dgrp_hugo_other" path="variationDb" value="4" />DGRP +
+							EMS screening + Other public databases
 						</label>
 						<form:errors path="variationDb" cssClass="error" />
 					</div>
@@ -62,26 +61,25 @@
 						type</div>
 					<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right">
 						<label class="radio"> <form:radiobutton path="queryType"
-								value="1" checked="checked"
-								onclick="queryByVariation()" />by variation (format: chr pos
-							ref alt)
+								value="1" checked="checked" onclick="queryByVariation()" /> by
+							variation (format: chr pos ref alt)
 						</label> <label class="radio"> <form:radiobutton path="queryType"
-								value="2" onclick="queryBySample()" />by sample
+								value="2" onclick="queryBySample()" /> by sample
 						</label> <label class="radio"> <form:radiobutton path="queryType"
-								value="3" onclick="queryByRegion()" />by genomic region
+								value="3" onclick="queryByRegion()" /> by genomic region
 							(format: chr start end)
 						</label> <label class="radio"> <form:radiobutton path="queryType"
-								value="4" onclick="queryByGeneName()" />by
-							gene name(whole region) (format: geneName)
+								value="4" onclick="queryByGeneName()" /> by gene name(whole
+							region) (format: geneName)
 						</label> <label class="radio"> <form:radiobutton path="queryType"
-								value="5" onclick="queryByGeneName()" />by
-							gene name(exon) (format: geneName)
+								value="5" onclick="queryByGeneName()" /> by gene name(exon)
+							(format: geneName)
 						</label>
 						<form:errors path="queryType" cssClass="error" />
 					</div>
 				</div>
 
-				<div class="row">
+				<div class="row mtd5p">
 					<div
 						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left">input
 						or choose a file</div>
@@ -111,10 +109,10 @@
 							</div>
 						</div>
 						<div id="div_choose_a_file" class="row">
-							<div class="row ft">Or Choose from a file:</div>
+							<div class="row">Or Choose from a file:</div>
 							<div class="row">
-								<input id="query_file" name="queryFile" type="file"
-									class="file" data-show-preview="false">
+								<input id="query_file" name="queryFile" type="file" class="file"
+									data-show-preview="false">
 							</div>
 						</div>
 						<form:errors path="queryInput" cssClass="error" />
@@ -130,12 +128,13 @@
 						<div
 							class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center pull-left">
 							<button id="query" type="button" name="query" value="query"
-								class="btn btn-lg btn-block">query</button>
+								class="btn btn-default btn-lg btn-block">query</button>
 						</div>
 						<div
-							class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center pull-right">
+							class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center pull-left">
 							<button id="query_and_annotate" type="button"
-								name="query_and_annotate" class="btn btn-lg btn-block"
+								name="query_and_annotate"
+								class="btn btn-default btn-lg btn-block"
 								value="query_and_annotate">query and annotate</button>
 						</div>
 					</div>
