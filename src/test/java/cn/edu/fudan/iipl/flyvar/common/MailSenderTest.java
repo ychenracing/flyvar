@@ -15,16 +15,24 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class MailSenderTest extends AbstractJUnit4SpringContextTests {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private JavaMailSender  mailSender;
+
+    @Autowired
+    private MailSenderUtils mailSenderUtils;
 
     @Test
-    public void send() {
+    public void sendText() {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setSubject("你好");
         mailMessage.setText("这个是一个通过Spring框架来发送邮件的小程序");
         mailMessage.setTo("315838650@qq.com");
         mailMessage.setFrom("flyvar@sina.cn");
         mailSender.send(mailMessage);
+    }
+
+    @Test
+    public void sendFreemarkerTemplate() {
+        mailSenderUtils.sendFreemarkerTemplate();
     }
 
 }
