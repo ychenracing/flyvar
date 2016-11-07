@@ -16,12 +16,12 @@
 	<div class="container">
 		<%@ include file="common/navi.jsp"%>
 		<div class="row mtd5p">
-			<div class="span12 ft pd90">
+			<div class="span12 text-justify pd90">
 				<img class="width100" src="static/images/flyvar.png" />
 			</div>
 		</div>
 		<div class="row mtd5p">
-			<div class="span12 ft pd90">Welcome to the fly variation
+			<div class="span12 text-justify pd90">Welcome to the fly variation
 				database(FlyVar) website. FlyVar is a free integrative platform that
 				addresses the increasing need of next generation sequencing data
 				analysis in the Drosophila research community. It is composed of
@@ -45,7 +45,7 @@
 						alt="click to visit this function"
 						style="width: 140px; height: 140px;"></a>
 					<h3>variation query</h3>
-					<p class="ft">Information of variants in the database could be
+					<p class="text-justify">Information of variants in the database could be
 						flexibly queried.</p>
 				</div>
 				<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center">
@@ -54,7 +54,7 @@
 						alt="click to visit this function"
 						style="width: 140px; height: 140px;"></a>
 					<h3>variation annotate</h3>
-					<p class="ft">This tool is a user friendly interface to
+					<p class="text-justify">This tool is a user friendly interface to
 						annotate variants at batch model. You will know thousands of
 						variants' function all at once.</p>
 				</div>
@@ -64,7 +64,7 @@
 						alt="click to visit this function"
 						style="width: 140px; height: 140px;"></a>
 					<h3>variation filter</h3>
-					<p class="ft">This function will remove common variants. It
+					<p class="text-justify">This function will remove common variants. It
 						will greatly reduce lab work to identify the potential phenotype
 						relevant mutation.</p>
 				</div>

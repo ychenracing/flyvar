@@ -3,7 +3,7 @@
 <link rel="icon" href="static/images/flyvar.ico" type="image/x-icon" />
 <link rel="stylesheet" href="static/css/buttons.css" />
 <link rel="stylesheet" href="static/css/bootstrap.css" />
-<link rel="stylesheet" href="static/css/bootstrap-theme.css">
+<link rel="stylesheet" href="static/css/bootstrap-theme.css" />
 <link rel="stylesheet" href="static/css/flyannotation.css" />
 <link rel="stylesheet" href="static/css/font-awesome.min.css" />
 <link rel="stylesheet" href="static/css/fileinput.css" media="all"

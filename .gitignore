@@ -1,13 +1,19 @@
 *.class
- 
+*.DS_Store
+
 # Package Files #
 *.jar
 *.war
 *.ear
- 
+
 # ignore Maven generated target folders
 target
- 
+
+# folder
+*/file/snpSamples/
+*/file/uploadFiles/
+*/file/scriptFiles/
+
 # ignore eclipse files
 .project
 .classpath

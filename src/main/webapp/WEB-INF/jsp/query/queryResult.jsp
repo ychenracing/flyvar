@@ -20,11 +20,11 @@
 					<table class="table table-hover">
 						<thead>
 							<tr>
-								<th class="ft text-nowrap">NO.</th>
-								<th class="ft text-nowrap">chr</th>
-								<th class="ft text-nowrap">pos</th>
-								<th class="ft text-nowrap">ref</th>
-								<th class="ft text-nowrap">var</th>
+								<th class="text-justify text-nowrap">NO.</th>
+								<th class="text-justify text-nowrap">chr</th>
+								<th class="text-justify text-nowrap">pos</th>
+								<th class="text-justify text-nowrap">ref</th>
+								<th class="text-justify text-nowrap">var</th>
 								<c:if
 									test="${queryType != null && (queryType == 1 || queryType == 2)}">
 									<th class="text-nowrap">number of flies</th>
@@ -34,14 +34,14 @@
 						<tbody>
 							<c:forEach var="variationItem" items="${queryResults}" varStatus="itemInfo">
 								<tr>
-									<td class="ft text-nowrap"><c:out value="${itemInfo.index+1}" /></td>
-									<td class="ft text-nowrap"><c:out value="${variationItem.getChr()}" /></td>
-									<td class="ft text-nowrap"><c:out value="${variationItem.getPos()}" /></td>
-									<td class="ft break-line"><c:out value="${variationItem.getRef()}" /></td>
-									<td class="ft break-line"><c:out value="${variationItem.getAlt()}" /></td>
+									<td class="text-justify text-nowrap"><c:out value="${itemInfo.index+1}" /></td>
+									<td class="text-justify text-nowrap"><c:out value="${variationItem.getChr()}" /></td>
+									<td class="text-justify text-nowrap"><c:out value="${variationItem.getPos()}" /></td>
+									<td class="text-justify break-line"><c:out value="${variationItem.getRef()}" /></td>
+									<td class="text-justify break-line"><c:out value="${variationItem.getAlt()}" /></td>
 									<c:if
 										test="${queryType != null && (queryType == 1 || queryType == 2)}">
-										<td class="ft text-nowrap"><c:out value="${variationItem.getCount()}" /></td>
+										<td class="text-justify text-nowrap"><c:out value="${variationItem.getCount()}" /></td>
 									</c:if>
 								</tr>
 							</c:forEach>

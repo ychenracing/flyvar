@@ -26,7 +26,7 @@
 
 	<context:component-scan base-package="cn.edu.fudan.iipl.flyvar" />
 
-	<!-- 引入jdbc配置文件 -->
+	<!-- 引入属性配置文件 -->
 	<bean id="propertyConfigurer"
 		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
 		<property name="locations">
@@ -37,6 +37,51 @@
 				<value>classpath:cn/edu/fudan/iipl/flyvar/mail/mail.properties</value>
 			</list>
 		</property>
+	</bean>
+
+	<bean id="freeMarkerConfigurer"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		<property name="preferFileSystemAccess" value="false" />
+		<property name="templateLoaderPath" value="/WEB-INF/" /> <!--指定模板文件目录 -->
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="freemarkerSettings"><!-- 设置FreeMarker环境属性 -->
+			<props>
+				<prop key="template_update_delay">1800</prop><!--刷新模板的周期，单位为秒 -->
+				<prop key="default_encoding">UTF-8</prop><!--模板的编码格式 -->
+				<prop key="locale">zh_CN</prop><!-- 本地化设置 -->
+				<prop key="localized_lookup">false</prop>
+				<prop key="url_escaping_charset">UTF-8</prop>
+				<prop key="output_encoding">UTF-8</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${spring.mail.host}" />
+		<property name="username" value="${spring.mail.username}" />
+		<property name="password" value="${spring.mail.password}" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.transport.protocol">${spring.mail.properties.mail.transport.protocol}</prop>
+				<prop key="mail.smtp.auth">${spring.mail.properties.mail.smtp.auth}</prop>
+				<prop key="mail.smtp.starttls.enable">${spring.mail.properties.mail.smtp.starttls.enable}</prop>
+				<prop key="mail.smtp.starttls.required">${spring.mail.properties.mail.smtp.starttls.required}</prop>
+				<prop key="mail.debug">${spring.mail.properties.mail.debug}</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- 配置线程池 -->
+	<bean id="taskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<!-- 线程池维护线程的最少数量 -->
+		<property name="corePoolSize" value="5" />
+		<!-- 线程池维护线程所允许的空闲时间 -->
+		<property name="keepAliveSeconds" value="30000" />
+		<!-- 线程池维护线程的最大数量 -->
+		<property name="maxPoolSize" value="1000" />
+		<!-- 线程池所使用的缓冲队列 -->
+		<property name="queueCapacity" value="200" />
 	</bean>
 
 	<!-- mongo START -->
@@ -147,23 +192,6 @@
 
 	<bean id="jdbcTemplate2" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="dataSource2" />
-	</bean>
-
-	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-		<property name="host" value="${spring.mail.host}" />
-		<property name="username" value="${spring.mail.username}" />
-		<property name="password" value="${spring.mail.password}" />
-
-		<!-- The name of the property, following JavaBean naming conventions -->
-		<property name="javaMailProperties">
-			<props>
-				<prop key="mail.transport.protocol">${spring.mail.properties.mail.transport.protocol}</prop>
-				<prop key="mail.smtp.auth">${spring.mail.properties.mail.smtp.auth}</prop>
-				<prop key="mail.smtp.starttls.enable">${spring.mail.properties.mail.smtp.starttls.enable}</prop>
-				<prop key="mail.smtp.starttls.required">${spring.mail.properties.mail.smtp.starttls.required}</prop>
-				<prop key="mail.debug">${spring.mail.properties.mail.debug}</prop>
-			</props>
-		</property>
 	</bean>
 
 	<!-- 对dataSource 数据源进行事务管理 -->

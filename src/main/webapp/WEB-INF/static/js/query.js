@@ -10,7 +10,7 @@
 	});
 	$(document).on('click', '#query_and_annotate', function() {
 		waitingDialog.show();
-		$("#queryForm").attr("action", "query/queryAnnotate.htm");
+		$("#queryForm").attr("action", "query/annotate.htm");
 		disableVariationDb(false);
 		$("#queryForm").submit();
 	});

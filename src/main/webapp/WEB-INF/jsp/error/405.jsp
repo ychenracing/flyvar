@@ -16,7 +16,7 @@
 		<%@ include file="../common/navi.jsp"%>
 		<div class="row">
 			<div class="span12 fc">
-				<span class="ft">Method not supported!</span>
+				<span class="text-justify">Method not supported!</span>
 			</div>
 		</div>
 		<%@ include file="../common/footer.jsp"%>

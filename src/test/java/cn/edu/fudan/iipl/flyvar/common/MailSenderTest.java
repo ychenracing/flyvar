@@ -15,10 +15,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class MailSenderTest extends AbstractJUnit4SpringContextTests {
 
     @Autowired
-    private JavaMailSender  mailSender;
+    private JavaMailSender   mailSender;
 
     @Autowired
-    private MailSenderUtils mailSenderUtils;
+    private FlyvarMailSender flyvarMailSender;
 
     @Test
     public void sendText() {
@@ -32,7 +32,6 @@ public class MailSenderTest extends AbstractJUnit4SpringContextTests {
 
     @Test
     public void sendFreemarkerTemplate() {
-        mailSenderUtils.sendFreemarkerTemplate();
     }
 
 }

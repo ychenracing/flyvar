@@ -16,7 +16,7 @@
 		<%@ include file="../common/navi.jsp"%>
 		<div class="row">
 			<div class="span12 fc">
-				<span class="ft">System error!</span>
+				<span class="text-justify">System error!</span>
 			</div>
 		</div>
 		<%@ include file="../common/footer.jsp"%>

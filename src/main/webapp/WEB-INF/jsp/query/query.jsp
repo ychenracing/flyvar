@@ -16,7 +16,7 @@
 	<div class="container">
 		<%@ include file="../common/navi.jsp"%>
 		<div class="row mtd5p">
-			<div class="span12 ft pd90">This querying module allows
+			<div class="span12 text-justify pd90">This querying module allows
 				flexible extraction of variation information from the database.
 				Three steps guide users to query the database. 'Choose database'
 				step gives a chance to determine the data source. 'Choose query
@@ -26,7 +26,7 @@
 		</div>
 
 		<div class="row mtd5p">
-			<div class="span12 ft pd90">
+			<div class="span12 text-justify pd90">
 				<strong>Note: Release 5 coordinates are used in this
 					database.</strong>
 			</div>
@@ -99,7 +99,7 @@
 							<form:errors path="selectSample" cssClass="error" />
 						</div>
 						<div id="div_input_email" class="row dn">
-							<div class="row ft">Input e-mail address for getting your
+							<div class="row text-justify">Input e-mail address for getting your
 								results:</div>
 							<div class="row">
 								<form:input path="queryEmail" id="query_email"
