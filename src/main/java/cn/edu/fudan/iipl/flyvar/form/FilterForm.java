@@ -34,6 +34,8 @@ public class FilterForm implements Serializable {
     /** 查询输入 */
     private String            filterInput;
 
+    private String            filterEmail;
+
     public Integer getVariationDb() {
         return variationDb;
     }
@@ -64,6 +66,14 @@ public class FilterForm implements Serializable {
 
     public void setFilterInput(String filterInput) {
         this.filterInput = filterInput;
+    }
+
+    public String getFilterEmail() {
+        return filterEmail;
+    }
+
+    public void setFilterEmail(String filterEmail) {
+        this.filterEmail = filterEmail;
     }
 
     @Override

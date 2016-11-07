@@ -41,9 +41,9 @@ public class FlyvarControllerAdvice extends AbstractController {
 
     private static final String SYSTEM_ERROR_JSP   = "error/500";
 
-    private static final String NOT_FOUND_JSP      = "error/404";
-
     private static final String INVALID_ACCESS_JSP = "error/invalidAccess";
+
+    private static final String NOT_FOUND_JSP      = "error/404";
 
     @ExceptionHandler(value = { IllegalArgumentException.class })
     @ResponseStatus(value = HttpStatus.OK)

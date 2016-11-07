@@ -34,6 +34,13 @@ public interface AnnotateService {
     public Path annotateVcfFormatVariation(Path vcfFormatVariationPath);
 
     /**
+     * async annotate and merge annotate result, and send results via email to user. see {@link cn.edu.fudan.iipl.flyvar.service.AnnotateService#annotateVcfFormatVariation(Path) annotateVcfFormatVariation(Path)}
+     * @param vcfFormatVariationPath
+     * @param receiver receiver email address
+     */
+    public void asyncAnnotateVcfFormatVariation(Path vcfFormatVariationPath, String receiver);
+
+    /**
      * Convert queryResultVariations to vcf file to prepare for annotating. This function will
      * generate a vcf file in annovar's annotationPath folder.
      * 

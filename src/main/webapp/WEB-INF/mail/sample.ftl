@@ -7,7 +7,7 @@
             <link href="static/css/buttons.css" rel="stylesheet"/>
             <link href="static/css/bootstrap.css" rel="stylesheet"/>
             <link href="static/css/bootstrap-theme.css" rel="stylesheet"/>
-            <link href="static/css/flyannotation.css" rel="stylesheet"/>
+            <link href="static/css/flyvar.css" rel="stylesheet"/>
             <link href="static/css/font-awesome.min.css" rel="stylesheet"/>
             <link href="static/css/fileinput.css" media="all" rel="stylesheet" type="text/css"/>
             <script src="static/js/jquery-2.2.4.js"></script>
@@ -34,7 +34,7 @@
             </div>
             <div class="row" style="text-align: left;">
                 <p style="text-indent: 2em;">
-                    <a href="">
+                    <a href="${domain}/flyvar">
                         <img class="width100" src="cid:flyvar-index"/>
                     </a>
                 </p>
@@ -46,7 +46,7 @@
             </div>
             <div class="row" style="text-align: right;">
                 <p>
-                    ${date}
+                    ${.now?string("yyyy-MM-dd HH:mm:ss")}
                 </p>
             </div>
         </div>

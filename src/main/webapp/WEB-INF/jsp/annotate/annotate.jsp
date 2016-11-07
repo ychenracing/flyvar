@@ -77,6 +77,16 @@
 									class="file" data-show-preview="false">
 							</div>
 						</div>
+						<div id="div_input_email" class="row dn">
+                            <div class=" text-justify">Input e-mail address for
+                                getting your results:</div>
+                            <div class="">
+                                <form:input path="annotateEmail" id="annotate_email"
+                                    name="annotate_email" class="form-control"
+                                    placeholder="input email address" />
+                                <form:errors path="annotateEmail" cssClass="error" />
+                            </div>
+                        </div>
 						<form:errors path="annotateInput" cssClass="error" />
 					</div>
 				</div>

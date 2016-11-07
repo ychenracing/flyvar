@@ -5,14 +5,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import cn.edu.fudan.iipl.flyvar.common.AnnovarUtils;
 import cn.edu.fudan.iipl.flyvar.common.FlyvarFileUtils;
@@ -23,6 +26,7 @@ import cn.edu.fudan.iipl.flyvar.model.QueryResultVariation;
 import cn.edu.fudan.iipl.flyvar.model.Variation;
 import cn.edu.fudan.iipl.flyvar.service.AnnotateService;
 import cn.edu.fudan.iipl.flyvar.service.CommandExecutorService;
+import cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService;
 
 /**
  * @author racing
@@ -31,16 +35,22 @@ import cn.edu.fudan.iipl.flyvar.service.CommandExecutorService;
 @Service
 public class AnnotateServiceImpl implements AnnotateService {
 
-    private static final Logger    logger = LoggerFactory.getLogger(AnnotateServiceImpl.class);
+    private static final Logger     logger = LoggerFactory.getLogger(AnnotateServiceImpl.class);
 
     @Autowired
-    private CommandExecutorService commandExecutorService;
+    private CommandExecutorService  commandExecutorService;
 
     @Autowired
-    private AnnovarUtils           annovarUtils;
+    private ThreadPoolTaskExecutor  taskExecutor;
 
     @Autowired
-    private PathUtils              pathUtils;
+    private FlyvarMailSenderService mailSenderService;
+
+    @Autowired
+    private AnnovarUtils            annovarUtils;
+
+    @Autowired
+    private PathUtils               pathUtils;
 
     @Override
     public Path annotateVcfFormatVariation(Path vcfFormatVariationPath) {
@@ -112,11 +122,11 @@ public class AnnotateServiceImpl implements AnnotateService {
     }
 
     /**
-     * @see cn.edu.fudan.iipl.flyvar.service.AnnotateService#mergeAnnotateResult(java.nio.file.Path)
+     * @see cn.edu.fudan.iipl.flyvar.service.AnnotateService#mergeAnnotateResult(java.lang.String)
      */
     @Override
     public Path mergeAnnotateResult(String annovarInputFileName) {
-        // TODO: problem exists in running R script.
+        // problem exists in running R script. Cannot combine annotate result in some cases.
         Path combinedOutputPath = null;
         try {
             List<String> combineScriptLines = Lists.newArrayList();
@@ -141,13 +151,53 @@ public class AnnotateServiceImpl implements AnnotateService {
             try {
                 commandExecutorService.execute(combineRunningCommand);
             } catch (CommandFailedException ex) {
-                throw new CombineAnnotateResultException("combine annotate result error!");
+                throw new CombineAnnotateResultException("combine annotate result error!", ex);
             }
         } catch (Exception ex) {
-            logger.error("combine annotate result error!", ex);
+            logger.warn("combine annotate result error! ex={}", ex.getMessage());
             throw new CombineAnnotateResultException("combine annotate result error!");
         }
         return combinedOutputPath;
+    }
+
+    @Override
+    public void asyncAnnotateVcfFormatVariation(Path vcfFormatVariationPath, String receiver) {
+        taskExecutor.execute(() -> {
+            Path vcfPath = annotateVcfFormatVariation(vcfFormatVariationPath);
+
+            Path annovarInputPath = annovarUtils
+                .getAnnovarInputPath(vcfPath.getFileName().toString());
+            Path annotateResultPath = annovarUtils
+                .getAnnotatePath(vcfPath.getFileName().toString());
+            Path exonicAnnotatePath = annovarUtils
+                .getExonicAnnotatePath(vcfPath.getFileName().toString());
+            Path combineAnnovarOutPath = annovarUtils
+                .getCombineAnnovarOutPath(vcfPath.getFileName().toString());
+            Path annovarInvalidInputPath = annovarUtils
+                .getAnnovarInvalidInputPath(vcfPath.getFileName().toString());
+
+            Map<String, Object> emailParams = Maps.newHashMap();
+            emailParams.put("annovarInput", annovarInputPath.getFileName().toString());
+            emailParams.put("annotateResult", annotateResultPath.getFileName().toString());
+            emailParams.put("exonicAnnotateResult", exonicAnnotatePath.getFileName().toString());
+            if (exonicAnnotatePath.toFile().length() > 0) {
+                Path combinedAnnotateResultPath = null;
+                try {
+                    combinedAnnotateResultPath = mergeAnnotateResult(
+                        vcfPath.getFileName().toString());
+                    emailParams.put("combinedExonicResult",
+                        combinedAnnotateResultPath.getFileName().toString());
+                } catch (CombineAnnotateResultException ex) {
+                }
+            }
+            emailParams.put("combineAnnovarOut", combineAnnovarOutPath.getFileName().toString());
+            if (annovarInvalidInputPath.toFile().exists()) {
+                emailParams.put("annovarInvalidInput",
+                    annovarInvalidInputPath.getFileName().toString());
+            }
+
+            mailSenderService.sendAnnotateResults(emailParams, receiver);
+        });
     }
 
 }

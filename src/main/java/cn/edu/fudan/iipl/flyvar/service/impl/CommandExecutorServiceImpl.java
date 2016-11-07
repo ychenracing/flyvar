@@ -78,7 +78,9 @@ public class CommandExecutorServiceImpl implements CommandExecutorService {
                 throw new CommandFailedException("Command executed failed!, cmd=" + command);
             }
         } catch (Exception ex) {
-            logger.error("Command executed failed!, cmd=" + command, ex);
+            if (!(ex instanceof CommandFailedException)) {
+                logger.error("Command executed failed!, cmd=" + command, ex);
+            }
             throw new CommandFailedException("Command executed failed!, cmd=" + command, ex);
         }
         logger.info("command execute finished! command={}", command);

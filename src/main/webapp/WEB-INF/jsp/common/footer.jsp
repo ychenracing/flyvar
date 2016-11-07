@@ -3,9 +3,8 @@
 </div>
 <div class="row">
 	<div class="span12 text-center">
-		<a href="contact.htm">Contact information</a>&nbsp;|&nbsp;<a
-			href="register.htm">Register</a>&nbsp;|&nbsp;<a href="login.htm">Log
-			in</a>
+		<a href="contact.htm">Contact information</a> | <a href="register.htm">Sign
+			up</a> | <a href="login.htm">Sign in</a>
 	</div>
 </div>
 <div class="row">

@@ -80,7 +80,6 @@ public class MailSenderServiceImpl implements MailSenderService {
         try {
             MimeMessage msg = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(msg, true, "utf-8");
-            System.out.println("sender:" + sender);
             helper.setFrom(sender);
             helper.setTo(receiver);
             helper.setSubject(MimeUtility.encodeText(subject, "utf-8", "B"));

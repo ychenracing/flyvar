@@ -56,12 +56,16 @@ import cn.edu.fudan.iipl.flyvar.service.AnnotateService;
 @Controller
 public class AnnotateController extends AbstractController {
 
-    private static final Logger logger              = LoggerFactory
+    private static final Logger logger                    = LoggerFactory
         .getLogger(AnnotateController.class);
 
-    private static final String ANNOTATE_JSP        = "annotate/annotate";
+    private static final String ANNOTATE_JSP              = "annotate/annotate";
 
-    private static final String ANNOTATE_RESULT_JSP = "annotate/result";
+    private static final String ANNOTATE_RESULT_JSP       = "annotate/result";
+
+    private static final String ASYNC_ANNOTATE_RESULT_JSP = "annotate/asyncResult";
+
+    private static final String EMAIL_PATTERN             = "^(.+)@(.+)$";
 
     @Autowired
     private PathUtils           pathUtils;
@@ -86,6 +90,15 @@ public class AnnotateController extends AbstractController {
             throw new InvalidAccessException("Invalid access!");
         }
         return ANNOTATE_RESULT_JSP;
+    }
+
+    @RequestMapping(value = { "/annotate/async/result.htm" }, method = { RequestMethod.GET })
+    public String asyncAnnotateResult(HttpServletRequest request, Model model) {
+        checkReferer(request);
+        if (!model.containsAttribute("asyncSuccess")) {
+            throw new InvalidAccessException("Invalid access!");
+        }
+        return ASYNC_ANNOTATE_RESULT_JSP;
     }
 
     @RequestMapping(value = { "/annotate/result/{filename:.+}" }, method = { RequestMethod.GET })
@@ -151,7 +164,7 @@ public class AnnotateController extends AbstractController {
             }
             vcfFilePath = annotateService.convertVariationsToVcfFile(variations);
         } else if (inputFormat == AnnotateInputType.VCF_FORMAT) { // vcf format
-            // no matter you submitted file or not, annotateFile never be null.
+            // no matter you submitted a file or not, annotateFile will never be null.
             if (StringUtils.isBlank(annotateForm.getAnnotateInput())) {
                 vcfFilePath = FlyvarFileUtils.saveUploadFileAndGetFilePath(annotateFile,
                     pathUtils.getAbsoluteAnnotationFilesPath().toString());
@@ -167,8 +180,26 @@ public class AnnotateController extends AbstractController {
                 logger.info("saved vcf lines to file! vcfFilePath={}", vcfFilePath);
             }
         }
+
+        /** if the file size is above 30M, do async annotate */
+        if (FileUtils.sizeOf(vcfFilePath.toFile()) > 30 * 1024 * 1024l) {
+            if (StringUtils.isBlank(annotateForm.getAnnotateEmail())
+                || !annotateForm.getAnnotateEmail().matches(EMAIL_PATTERN)) {
+                model.addAttribute("annotateForm", annotateForm);
+                bindings.rejectValue("annotateEmail", "error.annotate.annotateEmail");
+                logger.info("error submit! error format for annotateEmail: annotateForm={}",
+                    annotateForm);
+                return ANNOTATE_JSP;
+            }
+            /** async annotate variations. This operation will process data background and send results via email to user later. */
+            annotateService.asyncAnnotateVcfFormatVariation(vcfFilePath,
+                annotateForm.getAnnotateEmail());
+            redirectModel.addFlashAttribute("asyncSuccess", true);
+            return "redirect:/annotate/async/result.htm";
+        }
+
         annotateService.annotateVcfFormatVariation(vcfFilePath);
-        logger.info("annotate vcf file finished! vcfFilePath={}", vcfFilePath);
+
         Path annovarInputPath = annovarUtils
             .getAnnovarInputPath(vcfFilePath.getFileName().toString());
         Path annotateResultPath = annovarUtils
@@ -202,7 +233,6 @@ public class AnnotateController extends AbstractController {
                 annovarInvalidInputPath.getFileName().toString());
         }
         return "redirect:/annotate/result.htm";
-
     }
 
     private boolean validateAnnotateParams(HttpServletRequest request,

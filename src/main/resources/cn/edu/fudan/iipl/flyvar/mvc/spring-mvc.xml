@@ -21,24 +21,20 @@
 		validator="validator" />
 
 	<!-- 引入属性配置文件 -->
-	<bean id="propertyConfigurer"
-		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
-		<property name="locations">
-			<list>
-				<value>classpath:cn/edu/fudan/iipl/flyvar/db/jdbc.properties</value>
-				<value>classpath:cn/edu/fudan/iipl/flyvar/db/mongo.properties
-				</value>
-				<value>classpath:cn/edu/fudan/iipl/flyvar/cache/redis.properties
-				</value>
-				<value>classpath:cn/edu/fudan/iipl/flyvar/mail/mail.properties
-				</value>
-				<value>classpath:cn/edu/fudan/iipl/flyvar/file/file.properties
-				</value>
-				<value>classpath:cn/edu/fudan/iipl/flyvar/annovar/annovar.properties
-				</value>
-			</list>
-		</property>
-	</bean>
+    <bean id="propertyConfigurer"
+        class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:cn/edu/fudan/iipl/flyvar/db/jdbc.properties</value>
+                <value>classpath:cn/edu/fudan/iipl/flyvar/db/mongo.properties</value>
+                <value>classpath:cn/edu/fudan/iipl/flyvar/cache/redis.properties</value>
+                <value>classpath:cn/edu/fudan/iipl/flyvar/mail/mail.properties</value>
+                <value>classpath:cn/edu/fudan/iipl/flyvar/file/file.properties</value>
+                <value>classpath:cn/edu/fudan/iipl/flyvar/annovar/annovar.properties</value>
+                <value>classpath:cn/edu/fudan/iipl/flyvar/message/message.properties</value>
+            </list>
+        </property>
+    </bean>
 
 	<!-- 视图解释类 -->
 	<bean name="viewResolver"

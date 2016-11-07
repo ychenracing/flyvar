@@ -25,6 +25,9 @@ public class PathUtils {
     @Value("${file.sourceForDownloadingPath}")
     private String sourceForDownloadingPath;
 
+    @Value("${message.domain}")
+    private String domain;
+
     /**
      * 获取项目根路径
      * 
@@ -72,6 +75,14 @@ public class PathUtils {
 
     public void setSourceForDownloadingPath(String sourceForDownloadingPath) {
         this.sourceForDownloadingPath = sourceForDownloadingPath;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
     public Path getAbsoluteUploadFilesPath() {

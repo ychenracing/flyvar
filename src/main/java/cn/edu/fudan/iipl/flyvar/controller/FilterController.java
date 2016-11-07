@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,8 @@ public class FilterController extends AbstractController {
     private static final String FILTER_JSP        = "filter/filter";
 
     private static final String FILTER_RESULT_JSP = "filter/result";
+
+    private static final String EMAIL_PATTERN     = "^(.+)@(.+)$";
 
     @Autowired
     private PathUtils           pathUtils;
@@ -155,6 +158,24 @@ public class FilterController extends AbstractController {
             filterResult = filterService.filterDispensableGeneVariations(variations);
         }
         Path vcfFilePath = annotateService.convertVariationsToVcfFile(filterResult);
+
+        /** if the file size is above 30M, do async annotate */
+        if (FileUtils.sizeOf(vcfFilePath.toFile()) > 30 * 1024 * 1024l) {
+            if (StringUtils.isBlank(filterForm.getFilterEmail())
+                || !filterForm.getFilterEmail().matches(EMAIL_PATTERN)) {
+                model.addAttribute("filterForm", filterForm);
+                bindings.rejectValue("filterForm", "error.filter.filterForm");
+                logger.info("error submit! error format for filterEmail: filterForm={}",
+                    filterForm);
+                return FILTER_JSP;
+            }
+            /** async annotate variations. This operation will process data background and send results via email to user later. */
+            annotateService.asyncAnnotateVcfFormatVariation(vcfFilePath,
+                filterForm.getFilterEmail());
+            redirectModel.addFlashAttribute("asyncSuccess", true);
+            return "redirect:/annotate/async/result.htm";
+        }
+
         annotateService.annotateVcfFormatVariation(vcfFilePath);
         Path annovarInputPath = annovarUtils
             .getAnnovarInputPath(vcfFilePath.getFileName().toString());

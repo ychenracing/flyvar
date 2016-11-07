@@ -8,12 +8,13 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Maps;
 
-import cn.edu.fudan.iipl.flyvar.common.DateUtils;
 import cn.edu.fudan.iipl.flyvar.common.PathUtils;
 import cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService;
 import cn.edu.fudan.iipl.flyvar.service.MailSenderService;
@@ -21,11 +22,20 @@ import cn.edu.fudan.iipl.flyvar.service.MailSenderService;
 @Service
 public class FlyvarMailSenderServiceImpl implements FlyvarMailSenderService {
 
-    @Autowired
-    private MailSenderService mailSenderService;
+    private static final Logger logger                  = LoggerFactory
+        .getLogger(FlyvarMailSenderServiceImpl.class);
+
+    private static final String FLYVAR_INDEX_IMAGE_PATH = "WEB-INF/static/images/flyvar.png";
+
+    private static final String SAMPLE_TEMPLATE         = "mail/sample.ftl";
+
+    private static final String ANNOTATION_TEMPLATE     = "mail/annotation.ftl";
 
     @Autowired
-    private PathUtils         pathUtils;
+    private MailSenderService   mailSenderService;
+
+    @Autowired
+    private PathUtils           pathUtils;
 
     /*
      * @see cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService#sendSnpSample(java.util.List,
@@ -34,21 +44,32 @@ public class FlyvarMailSenderServiceImpl implements FlyvarMailSenderService {
     @Override
     public void sendSnpSample(List<String> sampleNames, String receiver) {
         String subject = "Sample(s) from FlyVar";
-        String templateFilePath = "mail/sample.ftl";
-        String indexImageFilePath = "WEB-INF/static/images/flyvar.png";
+        String templateFilePath = SAMPLE_TEMPLATE;
+        String indexImageFilePath = FLYVAR_INDEX_IMAGE_PATH;
         Pair<String, String> imagePair = new ImmutablePair<String, String>("flyvar-index",
             indexImageFilePath);
         List<String> samplePaths = sampleNames.stream()
             .map(sampleName -> Paths.get(pathUtils.getSnpSamplesPath(), sampleName).toString())
             .collect(Collectors.toList());
-        mailSenderService.asyncSend(subject, templateFilePath, getSampleParamMap(), receiver,
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("domain", pathUtils.getDomain());
+        mailSenderService.asyncSend(subject, templateFilePath, params, receiver,
             Arrays.asList(imagePair), samplePaths);
     }
 
-    private Map<String, Object> getSampleParamMap() {
-        Map<String, Object> map = Maps.newHashMap();
-        map.put("date", DateUtils.formatGeneral(DateUtils.current()));
-        return map;
+    /* 
+     * @see cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService#sendAnnotateResults(java.util.Map, java.lang.String)
+     */
+    @Override
+    public void sendAnnotateResults(Map<String, Object> emailParams, String receiver) {
+        String subject = "Result(s) from FlyVar";
+        String templateFilePath = ANNOTATION_TEMPLATE;
+        String indexImageFilePath = FLYVAR_INDEX_IMAGE_PATH;
+        Pair<String, String> imagePair = new ImmutablePair<String, String>("flyvar-index",
+            indexImageFilePath);
+        emailParams.put("domain", pathUtils.getDomain());
+        mailSenderService.send(subject, templateFilePath, emailParams, receiver,
+            Arrays.asList(imagePair), null);
     }
 
 }

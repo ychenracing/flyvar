@@ -17,12 +17,15 @@ public class AnnotateForm implements Serializable {
 
     private static final long serialVersionUID = 2562964373648381165L;
 
-    /** 查询类型 */
+    /** fotmat for variation input */
     @NotNull(message = "{error.annotate.inputFormatType}")
     private Integer           inputFormatType;
 
-    /** 查询输入 */
+    /** variation input */
     private String            annotateInput;
+
+    /**  */
+    private String            annotateEmail;
 
     public Integer getInputFormatType() {
         return inputFormatType;
@@ -38,6 +41,14 @@ public class AnnotateForm implements Serializable {
 
     public void setAnnotateInput(String annotateInput) {
         this.annotateInput = annotateInput;
+    }
+
+    public String getAnnotateEmail() {
+        return annotateEmail;
+    }
+
+    public void setAnnotateEmail(String annotateEmail) {
+        this.annotateEmail = annotateEmail;
     }
 
 }

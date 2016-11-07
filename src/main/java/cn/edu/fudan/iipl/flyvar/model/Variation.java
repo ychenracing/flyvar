@@ -134,8 +134,11 @@ public class Variation implements Comparable<Variation>, Serializable {
             String pos = varSplitted[i++];
             String ref = varSplitted[i++];
             String alt = varSplitted[i];
-            if (!pos.matches("[0-9]+") || !ref.matches("[ATCG]+") || !alt.matches("[ATCG]+")) {
-                return null;
+            String nucleotideRegex = "[ATCGN]+";
+            String positionRegex = "[0-9]+";
+            if (!pos.matches(positionRegex) || !ref.matches(nucleotideRegex)
+                || !alt.matches(nucleotideRegex)) {
+                continue;
             }
             Variation variation = new Variation(chr, Long.parseLong(pos), ref, alt);
             result.add(variation);

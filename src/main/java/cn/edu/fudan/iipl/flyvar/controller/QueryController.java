@@ -13,11 +13,13 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
@@ -74,6 +76,8 @@ public class QueryController extends AbstractController {
 
     private static final String     SAMPLE_LIST_JSP            = "query/sampleList";
 
+    private static final String     EMAIL_PATTERN              = "^(.+)@(.+)$";
+
     @Autowired
     private PathUtils               pathUtils;
 
@@ -94,6 +98,9 @@ public class QueryController extends AbstractController {
 
     @Autowired
     private CacheService            cacheService;
+
+    @Autowired
+    private ThreadPoolTaskExecutor  taskExecutor;
 
     @RequestMapping(value = { "/query.htm" }, method = { RequestMethod.GET })
     public String showQuery(Model model) {
@@ -159,32 +166,75 @@ public class QueryController extends AbstractController {
         }
         QueryType queryType = QueryType.of(queryForm.getQueryType());
 
-        boolean success = false;
+        List<QueryResultVariation> queryResult = null;
         switch (queryType) {
             case VARIATION:
-                success = queryAnnotateByVariation(queryForm, bindings, queryFile, redirectModel,
-                    model);
+                queryResult = queryAnnotateByVariation(queryForm, bindings, queryFile,
+                    redirectModel, model);
                 break;
             case SAMPLE:
-                success = queryAnnotateBySample(queryForm, bindings, queryFile, redirectModel,
-                    model);
-                break;
+                boolean success = queryAnnotateBySample(queryForm, bindings, queryFile,
+                    redirectModel, model);
+                return success ? "redirect:/annotate/result.htm" : QUERY_JSP;
             case REGION:
-                success = queryAnnotateByRegion(queryForm, bindings, queryFile, redirectModel,
+                queryResult = queryAnnotateByRegion(queryForm, bindings, queryFile, redirectModel,
                     model);
                 break;
             case GENE_WHOLE:
-                success = queryAnnotateByGeneNameWhole(queryForm, bindings, queryFile,
+                queryResult = queryAnnotateByGeneNameWhole(queryForm, bindings, queryFile,
                     redirectModel, model);
                 break;
             case GENE_EXON:
-                success = queryAnnotateByGeneNameExon(queryForm, bindings, queryFile, redirectModel,
-                    model);
+                queryResult = queryAnnotateByGeneNameExon(queryForm, bindings, queryFile,
+                    redirectModel, model);
                 break;
             default:
                 throw new FlyvarSystemException("Error submit!");
         }
-        return success ? "redirect:/annotate/result.htm" : QUERY_JSP;
+        if (queryResult == null) {
+            return QUERY_JSP;
+        }
+
+        /** if lines of the variations to annotate is above 300,000, do async annotate */
+        if (queryResult.size() > 300000) {
+            if (StringUtils.isBlank(queryForm.getQueryEmail())
+                || !queryForm.getQueryEmail().matches(EMAIL_PATTERN)) {
+                model.addAttribute("queryForm", queryForm);
+                bindings.rejectValue("queryForm", "error.queryForm");
+                logger.info("error submit! error format for queryEmail: queryForm={}", queryForm);
+                return QUERY_JSP;
+            }
+            final List<QueryResultVariation> finalQueryResult = queryResult;
+            taskExecutor.execute(() -> {
+                Path annotateResultVcfPath = queryService.annotateResultVariation(finalQueryResult);
+                /** async annotate variations. This operation will process data background and send results via email to user later. */
+                annotateService.asyncAnnotateVcfFormatVariation(annotateResultVcfPath,
+                    queryForm.getQueryEmail());
+            });
+            redirectModel.addFlashAttribute("asyncSuccess", true);
+            return "redirect:/annotate/async/result.htm";
+        }
+
+        Path annotateResultVcfPath = queryService.annotateResultVariation(queryResult);
+
+        /** if the file size is above 20M, do async annotate */
+        if (FileUtils.sizeOf(annotateResultVcfPath.toFile()) > 20 * 1024 * 1024l) {
+            if (StringUtils.isBlank(queryForm.getQueryEmail())
+                || !queryForm.getQueryEmail().matches(EMAIL_PATTERN)) {
+                model.addAttribute("queryForm", queryForm);
+                bindings.rejectValue("queryForm", "error.queryForm");
+                logger.info("error submit! error format for queryEmail: queryForm={}", queryForm);
+                return QUERY_JSP;
+            }
+            /** async annotate variations. This operation will process data background and send results via email to user later. */
+            annotateService.asyncAnnotateVcfFormatVariation(annotateResultVcfPath,
+                queryForm.getQueryEmail());
+            redirectModel.addFlashAttribute("asyncSuccess", true);
+            return "redirect:/annotate/async/result.htm";
+        }
+
+        addAnnotateRedirectAttributes(redirectModel, annotateResultVcfPath);
+        return "redirect:/annotate/result.htm";
     }
 
     @RequestMapping(value = { "/query/result.htm" }, method = { RequestMethod.GET })
@@ -238,7 +288,7 @@ public class QueryController extends AbstractController {
                     queryForm);
                 return false;
             }
-            if (!queryForm.getQueryEmail().matches("^(.+)@(.+)$")) {
+            if (!queryForm.getQueryEmail().matches(EMAIL_PATTERN)) {
                 model.addAttribute("queryForm", queryForm);
                 bindings.rejectValue("queryEmail", "error.queryEmail");
                 logger.info("error submit! queryEmail is empty: queryForm={}", queryForm);
@@ -341,11 +391,13 @@ public class QueryController extends AbstractController {
      * @param queryFile
      * @param redirectModel
      * @param model
-     * @return true if processing successfully, false else.
+     * @return list if query success, null else.
      */
-    private boolean queryAnnotateByVariation(@Valid QueryForm queryForm, BindingResult bindings,
-                                             MultipartFile queryFile,
-                                             RedirectAttributes redirectModel, Model model) {
+    private List<QueryResultVariation> queryAnnotateByVariation(@Valid QueryForm queryForm,
+                                                                BindingResult bindings,
+                                                                MultipartFile queryFile,
+                                                                RedirectAttributes redirectModel,
+                                                                Model model) {
         String variationStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(variationStr)) {
             variationStr = FlyvarFileUtils.readFileToStringDiscardHeader(
@@ -358,13 +410,10 @@ public class QueryController extends AbstractController {
             bindings.rejectValue("queryInput", "error.queryInputFormat");
             logger.info("error submit! error format for variation input or file: queryForm={}",
                 queryForm);
-            return false;
+            return null;
         }
-        List<QueryResultVariation> queryResult = queryService.queryByVariation(variations,
+        return queryService.queryByVariation(variations,
             VariationDataBaseType.of(queryForm.getVariationDb()));
-        Path annotateResultVcfPath = queryService.annotateResultVariation(queryResult);
-        addAnnotateRedirectAttributes(redirectModel, annotateResultVcfPath);
-        return true;
     }
 
     /**
@@ -454,11 +503,13 @@ public class QueryController extends AbstractController {
      * @param queryFile
      * @param redirectModel
      * @param model
-     * @return true if processing successfully, false else.
+     * @return  list if query success, null else.
      */
-    private boolean queryAnnotateByRegion(@Valid QueryForm queryForm, BindingResult bindings,
-                                          MultipartFile queryFile, RedirectAttributes redirectModel,
-                                          Model model) {
+    private List<QueryResultVariation> queryAnnotateByRegion(@Valid QueryForm queryForm,
+                                                             BindingResult bindings,
+                                                             MultipartFile queryFile,
+                                                             RedirectAttributes redirectModel,
+                                                             Model model) {
         String regionStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(regionStr)) {
             regionStr = FlyvarFileUtils.readFileToStringDiscardHeader(
@@ -471,13 +522,10 @@ public class QueryController extends AbstractController {
             bindings.rejectValue("queryInput", "error.queryInputFormat");
             logger.info("error submit! error format for variation input or file: queryForm={}",
                 queryForm);
-            return false;
+            return null;
         }
-        List<QueryResultVariation> queryResult = queryService.queryByRegion(regions,
+        return queryService.queryByRegion(regions,
             VariationDataBaseType.of(queryForm.getVariationDb()));
-        Path annotateResultVcfPath = queryService.annotateResultVariation(queryResult);
-        addAnnotateRedirectAttributes(redirectModel, annotateResultVcfPath);
-        return true;
     }
 
     /**
@@ -522,11 +570,13 @@ public class QueryController extends AbstractController {
      * @param queryFile
      * @param redirectModel
      * @param model
-     * @return true if processing successfully, false else.
+     * @return list if query success, null else.
      */
-    private boolean queryAnnotateByGeneNameWhole(@Valid QueryForm queryForm, BindingResult bindings,
-                                                 MultipartFile queryFile,
-                                                 RedirectAttributes redirectModel, Model model) {
+    private List<QueryResultVariation> queryAnnotateByGeneNameWhole(@Valid QueryForm queryForm,
+                                                                    BindingResult bindings,
+                                                                    MultipartFile queryFile,
+                                                                    RedirectAttributes redirectModel,
+                                                                    Model model) {
         String variationStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(variationStr)) {
             variationStr = FlyvarFileUtils.readFileToStringDiscardHeader(
@@ -538,14 +588,11 @@ public class QueryController extends AbstractController {
             bindings.rejectValue("queryInput", "error.queryInputFormat");
             logger.info("error submit! error format for variation input or file: queryForm={}",
                 queryForm);
-            return false;
+            return null;
         }
         List<String> geneNames = Lists.newArrayList(variationStr.split("\\s+"));
-        List<QueryResultVariation> queryResult = queryService.queryByGeneNameWholeRegion(geneNames,
+        return queryService.queryByGeneNameWholeRegion(geneNames,
             VariationDataBaseType.of(queryForm.getVariationDb()));
-        Path annotateResultVcfPath = queryService.annotateResultVariation(queryResult);
-        addAnnotateRedirectAttributes(redirectModel, annotateResultVcfPath);
-        return true;
     }
 
     /**
@@ -590,11 +637,13 @@ public class QueryController extends AbstractController {
      * @param queryFile
      * @param redirectModel
      * @param model
-     * @return true if processing successfully, false else.
+     * @return  list if query success, null else.
      */
-    private boolean queryAnnotateByGeneNameExon(@Valid QueryForm queryForm, BindingResult bindings,
-                                                MultipartFile queryFile,
-                                                RedirectAttributes redirectModel, Model model) {
+    private List<QueryResultVariation> queryAnnotateByGeneNameExon(@Valid QueryForm queryForm,
+                                                                   BindingResult bindings,
+                                                                   MultipartFile queryFile,
+                                                                   RedirectAttributes redirectModel,
+                                                                   Model model) {
         String variationStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(variationStr)) {
             variationStr = FlyvarFileUtils.readFileToStringDiscardHeader(
@@ -606,13 +655,10 @@ public class QueryController extends AbstractController {
             bindings.rejectValue("queryInput", "error.queryInputFormat");
             logger.info("error submit! error format for variation input or file: queryForm={}",
                 queryForm);
-            return false;
+            return null;
         }
         List<String> geneNames = Lists.newArrayList(variationStr.split("\\s+"));
-        List<QueryResultVariation> queryResult = queryService.queryByGeneNameExonRegion(geneNames,
+        return queryService.queryByGeneNameExonRegion(geneNames,
             VariationDataBaseType.of(queryForm.getVariationDb()));
-        Path annotateResultVcfPath = queryService.annotateResultVariation(queryResult);
-        addAnnotateRedirectAttributes(redirectModel, annotateResultVcfPath);
-        return true;
     }
 }
