@@ -1,5 +1,6 @@
 *.class
 *.DS_Store
+*.only_homo
 
 # Package Files #
 *.jar
