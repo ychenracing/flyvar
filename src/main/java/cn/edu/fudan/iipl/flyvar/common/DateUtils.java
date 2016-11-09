@@ -16,10 +16,18 @@ import java.util.Date;
  */
 public class DateUtils {
 
-    private static final String GENERAL_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    private static final String GENERAL_PATTERN  = "yyyy-MM-dd HH:mm:ss";
+
+    /** 用于filename的日期格式 */
+    private static final String FILENAME_PATTERN = "yyyyMMddHHmmss";
 
     public static String formatGeneral(Date date) {
         DateFormat df = new SimpleDateFormat(GENERAL_PATTERN);
+        return df.format(date);
+    }
+
+    public static String formatFilename(Date date) {
+        DateFormat df = new SimpleDateFormat(FILENAME_PATTERN);
         return df.format(date);
     }
 

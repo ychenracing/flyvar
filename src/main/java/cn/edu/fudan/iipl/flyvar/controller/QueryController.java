@@ -3,9 +3,6 @@
  */
 package cn.edu.fudan.iipl.flyvar.controller;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,13 +10,11 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -33,7 +28,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import cn.edu.fudan.iipl.flyvar.AbstractController;
+import cn.edu.fudan.iipl.flyvar.common.FlyvarFileUtils;
 import cn.edu.fudan.iipl.flyvar.common.FlyvarMailSender;
+import cn.edu.fudan.iipl.flyvar.exception.FlyvarSystemException;
 import cn.edu.fudan.iipl.flyvar.form.QueryForm;
 import cn.edu.fudan.iipl.flyvar.model.QueryResultVariation;
 import cn.edu.fudan.iipl.flyvar.model.Variation;
@@ -61,7 +58,8 @@ public class QueryController extends AbstractController {
 
     private static final String QUERY_BY_SAMPLE_RESULT_JSP = "query/sendEmailSuccess";
 
-    private static final String UPLOADED_FILE_PATH         = "/WEB-INF/file";
+    @Value("${file.uploadFilesPath}")
+    private String              uploadPath;
 
     @Autowired
     private SampleNameService   sampleNameService;
@@ -122,7 +120,7 @@ public class QueryController extends AbstractController {
                 success = queryByGeneNameExon(queryForm, bindings, queryFile, redirectModel, model);
                 return success ? "redirect:/query/result.htm" : QUERY_JSP;
             default:
-                throw new RuntimeException("Error submit!");
+                throw new FlyvarSystemException("Error submit!");
         }
     }
 
@@ -138,12 +136,8 @@ public class QueryController extends AbstractController {
         Set<Variation> variations = null;
         String variationStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(queryForm.getQueryInput())) {
-            try {
-                variationStr = FileUtils
-                    .readFileToString(saveFileAndGetFilePath(queryFile).toFile(), "utf-8");
-            } catch (IOException e) {
-                logger.error("read file error! queryFile=" + queryFile, e);
-            }
+            variationStr = FlyvarFileUtils.readFileToStringDiscardHeader(
+                FlyvarFileUtils.saveFileAndGetFilePath(queryFile, uploadPath));
         }
         variations = Variation.convertInputToVariations(variationStr);
         if (variations == null) {
@@ -172,21 +166,6 @@ public class QueryController extends AbstractController {
             throw new RuntimeException("Invalid access!");
         }
         return QUERY_BY_SAMPLE_RESULT_JSP;
-    }
-
-    private Path saveFileAndGetFilePath(MultipartFile file) {
-        String originName = file.getOriginalFilename();
-        String baseName = FilenameUtils.getBaseName(originName);
-        String extName = FilenameUtils.getExtension(originName);
-        StringBuilder newFilePath = new StringBuilder(UPLOADED_FILE_PATH).append(baseName)
-            .append("_").append(System.currentTimeMillis()).append(RandomUtils.nextInt(0, 1000))
-            .append(".").append(extName);
-        try {
-            file.transferTo(FileUtils.getFile(newFilePath.toString()));
-        } catch (IllegalStateException | IOException e) {
-            logger.error("save uploaded file error! newFilePath=" + newFilePath, e);
-        }
-        return Paths.get(newFilePath.toString());
     }
 
     private boolean validateQueryParams(HttpServletRequest request, @Valid QueryForm queryForm,
@@ -239,12 +218,8 @@ public class QueryController extends AbstractController {
         Set<Variation> variations = null;
         String variationStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(queryForm.getQueryInput())) {
-            try {
-                variationStr = FileUtils
-                    .readFileToString(saveFileAndGetFilePath(queryFile).toFile(), "utf-8");
-            } catch (IOException e) {
-                logger.error("read file error! queryFile=" + queryFile, e);
-            }
+            variationStr = FlyvarFileUtils.readFileToStringDiscardHeader(
+                FlyvarFileUtils.saveFileAndGetFilePath(queryFile, uploadPath));
         }
         variations = Variation.convertInputToVariations(variationStr);
         if (variations == null) {
@@ -276,12 +251,8 @@ public class QueryController extends AbstractController {
         Set<VariationRegion> regions = null;
         String regionStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(queryForm.getQueryInput())) {
-            try {
-                regionStr = FileUtils.readFileToString(saveFileAndGetFilePath(queryFile).toFile(),
-                    "utf-8");
-            } catch (IOException e) {
-                logger.error("read file error! queryFile=" + queryFile, e);
-            }
+            regionStr = FlyvarFileUtils.readFileToStringDiscardHeader(
+                FlyvarFileUtils.saveFileAndGetFilePath(queryFile, uploadPath));
         }
         regions = VariationRegion.convertInputToRegions(regionStr);
         if (regions == null) {
@@ -312,12 +283,8 @@ public class QueryController extends AbstractController {
                                          Model model) {
         String variationStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(queryForm.getQueryInput())) {
-            try {
-                variationStr = FileUtils
-                    .readFileToString(saveFileAndGetFilePath(queryFile).toFile(), "utf-8");
-            } catch (IOException e) {
-                logger.error("read file error! queryFile=" + queryFile, e);
-            }
+            variationStr = FlyvarFileUtils.readFileToStringDiscardHeader(
+                FlyvarFileUtils.saveFileAndGetFilePath(queryFile, uploadPath));
         }
         if (StringUtils.isBlank(variationStr)) {
             model.addAttribute("queryForm", queryForm);
@@ -348,12 +315,8 @@ public class QueryController extends AbstractController {
                                         Model model) {
         String variationStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(queryForm.getQueryInput())) {
-            try {
-                variationStr = FileUtils
-                    .readFileToString(saveFileAndGetFilePath(queryFile).toFile(), "utf-8");
-            } catch (IOException e) {
-                logger.error("read file error! queryFile=" + queryFile, e);
-            }
+            variationStr = FlyvarFileUtils.readFileToStringDiscardHeader(
+                FlyvarFileUtils.saveFileAndGetFilePath(queryFile, uploadPath));
         }
         if (StringUtils.isBlank(variationStr)) {
             model.addAttribute("queryForm", queryForm);

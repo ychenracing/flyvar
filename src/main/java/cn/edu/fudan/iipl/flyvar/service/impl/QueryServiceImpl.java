@@ -3,6 +3,8 @@
  */
 package cn.edu.fudan.iipl.flyvar.service.impl;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -25,6 +28,7 @@ import cn.edu.fudan.iipl.flyvar.model.VariationRegion;
 import cn.edu.fudan.iipl.flyvar.model.constants.Constants;
 import cn.edu.fudan.iipl.flyvar.model.constants.GeneNameType;
 import cn.edu.fudan.iipl.flyvar.model.constants.VariationDataBaseType;
+import cn.edu.fudan.iipl.flyvar.service.AnnotateService;
 import cn.edu.fudan.iipl.flyvar.service.CacheService;
 import cn.edu.fudan.iipl.flyvar.service.QueryService;
 
@@ -39,6 +43,9 @@ public class QueryServiceImpl implements QueryService {
 
     private static final Logger logger = LoggerFactory.getLogger(QueryServiceImpl.class);
 
+    @Value("${file.annotationFilesPath}")
+    private String              annotationPath;
+
     @Autowired
     private QueryDao            queryDao;
 
@@ -47,6 +54,9 @@ public class QueryServiceImpl implements QueryService {
 
     @Autowired
     private CacheService        cacheService;
+
+    @Autowired
+    private AnnotateService     annotateService;
 
     private String getExistsCacheKey(Variation variation, String tableName) {
         return Constants.CACHE_VARIATION_EXIST_IN_DB + tableName + "_" + variation.getChr() + "_"
@@ -257,6 +267,15 @@ public class QueryServiceImpl implements QueryService {
             return queryByRegion(variationRegions, variationDbType);
         }).flatMap(resultVariations -> resultVariations.stream()).collect(Collectors.toList());
         return result == null ? Lists.newArrayList() : result;
+    }
+
+    @Override
+    public Path annotateResultVariation(Collection<QueryResultVariation> resultVariation) {
+
+        String annovarInputFileName = "";
+        Path resultPath = annotateService
+            .annotateVariationVcfFormat(Paths.get(annovarInputFileName));
+        return resultPath;
     }
 
 }

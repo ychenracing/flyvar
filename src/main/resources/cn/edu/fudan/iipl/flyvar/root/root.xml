@@ -35,6 +35,8 @@
 				<value>classpath:cn/edu/fudan/iipl/flyvar/db/mongo.properties</value>
 				<value>classpath:cn/edu/fudan/iipl/flyvar/cache/redis.properties</value>
 				<value>classpath:cn/edu/fudan/iipl/flyvar/mail/mail.properties</value>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/file/file.properties</value>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/annovar/annovar.properties</value>
 			</list>
 		</property>
 	</bean>

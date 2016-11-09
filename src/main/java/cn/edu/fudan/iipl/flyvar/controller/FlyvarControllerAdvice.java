@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.google.common.collect.Maps;
 
 import cn.edu.fudan.iipl.flyvar.AbstractController;
+import cn.edu.fudan.iipl.flyvar.exception.FlyvarSystemException;
 import cn.edu.fudan.iipl.flyvar.model.constants.ErrorType;
 
 /**
@@ -33,7 +34,10 @@ import cn.edu.fudan.iipl.flyvar.model.constants.ErrorType;
 @ControllerAdvice
 public class FlyvarControllerAdvice extends AbstractController {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlyvarControllerAdvice.class);
+    private static final Logger logger           = LoggerFactory
+        .getLogger(FlyvarControllerAdvice.class);
+
+    private static final String SYSTEM_ERROR_JSP = "error/500";
 
     @ExceptionHandler(value = { IllegalArgumentException.class })
     @ResponseStatus(value = HttpStatus.OK)
@@ -59,6 +63,14 @@ public class FlyvarControllerAdvice extends AbstractController {
         map.put("code", ErrorType.NOT_SUPPORTED.getCode());
         map.put("message", ErrorType.NOT_SUPPORTED.getMsg());
         return map;
+    }
+
+    @ExceptionHandler(value = { FlyvarSystemException.class })
+    @ResponseStatus(value = HttpStatus.OK)
+    public String processSystemException(FlyvarSystemException error, HttpServletRequest request,
+                                         HttpServletResponse response) {
+        logger.info(getClientIP(request) + " " + error.getMessage());
+        return SYSTEM_ERROR_JSP;
     }
 
     @ExceptionHandler(value = { Exception.class })

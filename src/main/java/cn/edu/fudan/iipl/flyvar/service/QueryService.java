@@ -3,6 +3,7 @@
  */
 package cn.edu.fudan.iipl.flyvar.service;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
@@ -66,5 +67,12 @@ public interface QueryService {
      */
     public List<QueryResultVariation> queryByGeneNameExonRegion(Collection<String> geneNames,
                                                                 VariationDataBaseType variationDbType);
+
+    /**
+     * annotate result variations. 
+     * @param resultVariation
+     * @return saved file path for vcf format of result variations before annotation.
+     */
+    public Path annotateResultVariation(Collection<QueryResultVariation> resultVariation);
 
 }

@@ -4,6 +4,12 @@
 package cn.edu.fudan.iipl.flyvar.model;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -73,5 +79,16 @@ public class QueryResultVariation implements Serializable {
 
     public void setCount(Integer count) {
         this.count = count;
+    }
+
+    public static String convertToVcfLine(QueryResultVariation resultVariation) {
+        return StringUtils.join(Lists.<String> newArrayList(resultVariation.getChr(),
+            String.valueOf(resultVariation.getPos()), ".", resultVariation.getRef(),
+            resultVariation.getAlt(), ".", ".", ".", ".", "."), "\t");
+    }
+
+    public static List<String> convertToVcfLines(List<QueryResultVariation> resultVariations) {
+        return resultVariations.stream().map(variation -> convertToVcfLine(variation))
+            .collect(Collectors.toList());
     }
 }
