@@ -11,9 +11,7 @@
 target
 
 # folder
-*/file/snpSamples/
-*/file/uploadFiles/
-*/file/scriptFiles/
+src/main/webapp/WEB-INF/file/
 
 # ignore eclipse files
 .project
