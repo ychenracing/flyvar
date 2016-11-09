@@ -1,4 +1,4 @@
-package cn.edu.fudan.iipl.flyvar.common;
+package cn.edu.fudan.iipl.flyvar.service.impl;
 
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -9,23 +9,24 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Maps;
 
+import cn.edu.fudan.iipl.flyvar.common.DateUtils;
+import cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService;
 import cn.edu.fudan.iipl.flyvar.service.MailSenderService;
 
-@Component
-public class FlyvarMailSender {
+@Service
+public class FlyvarMailSenderServiceImpl implements FlyvarMailSenderService {
 
     @Autowired
     private MailSenderService mailSenderService;
 
-    /**
-     * query by sample中，发送sample邮件给用户
-     * @param sampleNames
-     * @param receiver
+    /* 
+     * @see cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService#sendSnpSample(java.util.List, java.lang.String)
      */
+    @Override
     public void sendSnpSample(List<String> sampleNames, String receiver) {
         String subject = "Sample(s) from FlyVar";
         String templateFilePath = "mail/sample.ftl";

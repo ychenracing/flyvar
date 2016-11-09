@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,7 +28,7 @@ import com.google.common.collect.Maps;
 
 import cn.edu.fudan.iipl.flyvar.AbstractController;
 import cn.edu.fudan.iipl.flyvar.common.FlyvarFileUtils;
-import cn.edu.fudan.iipl.flyvar.common.FlyvarMailSender;
+import cn.edu.fudan.iipl.flyvar.common.PathUtils;
 import cn.edu.fudan.iipl.flyvar.exception.FlyvarSystemException;
 import cn.edu.fudan.iipl.flyvar.form.QueryForm;
 import cn.edu.fudan.iipl.flyvar.model.QueryResultVariation;
@@ -37,6 +36,7 @@ import cn.edu.fudan.iipl.flyvar.model.Variation;
 import cn.edu.fudan.iipl.flyvar.model.VariationRegion;
 import cn.edu.fudan.iipl.flyvar.model.constants.QueryType;
 import cn.edu.fudan.iipl.flyvar.model.constants.VariationDataBaseType;
+import cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService;
 import cn.edu.fudan.iipl.flyvar.service.QueryService;
 import cn.edu.fudan.iipl.flyvar.service.SampleNameService;
 
@@ -49,26 +49,26 @@ import cn.edu.fudan.iipl.flyvar.service.SampleNameService;
 @Controller
 public class QueryController extends AbstractController {
 
-    private static final Logger logger                     = LoggerFactory
+    private static final Logger     logger                     = LoggerFactory
         .getLogger(QueryController.class);
 
-    private static final String QUERY_JSP                  = "query/query";
+    private static final String     QUERY_JSP                  = "query/query";
 
-    private static final String QUERY_RESULT_JSP           = "query/queryResult";
+    private static final String     QUERY_RESULT_JSP           = "query/queryResult";
 
-    private static final String QUERY_BY_SAMPLE_RESULT_JSP = "query/sendEmailSuccess";
-
-    @Value("${file.uploadFilesPath}")
-    private String              uploadPath;
+    private static final String     QUERY_BY_SAMPLE_RESULT_JSP = "query/sendEmailSuccess";
 
     @Autowired
-    private SampleNameService   sampleNameService;
+    private PathUtils               pathUtils;
 
     @Autowired
-    private QueryService        queryService;
+    private SampleNameService       sampleNameService;
 
     @Autowired
-    private FlyvarMailSender    flyvarMailSender;
+    private QueryService            queryService;
+
+    @Autowired
+    private FlyvarMailSenderService flyvarMailSenderService;
 
     @RequestMapping(value = { "/query.htm" }, method = { RequestMethod.GET })
     public String showQuery(Model model) {
@@ -105,7 +105,7 @@ public class QueryController extends AbstractController {
             case SAMPLE:
                 String realSampleName = "DGRP-" + queryForm.getSelectSample().substring(5, 8)
                                         + ".SNP.only_homo";
-                flyvarMailSender.sendSnpSample(Lists.newArrayList(realSampleName),
+                flyvarMailSenderService.sendSnpSample(Lists.newArrayList(realSampleName),
                     queryForm.getQueryEmail());
                 redirectModel.addFlashAttribute("success", "success");
                 return "redirect:/query/sample/success.htm";
@@ -137,7 +137,8 @@ public class QueryController extends AbstractController {
         String variationStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(queryForm.getQueryInput())) {
             variationStr = FlyvarFileUtils.readFileToStringDiscardHeader(
-                FlyvarFileUtils.saveFileAndGetFilePath(queryFile, uploadPath));
+                FlyvarFileUtils.saveUploadFileAndGetFilePath(queryFile,
+                    pathUtils.getAbsoluteUploadFilesPath().toString()));
         }
         variations = Variation.convertInputToVariations(variationStr);
         if (variations == null) {
@@ -219,7 +220,8 @@ public class QueryController extends AbstractController {
         String variationStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(queryForm.getQueryInput())) {
             variationStr = FlyvarFileUtils.readFileToStringDiscardHeader(
-                FlyvarFileUtils.saveFileAndGetFilePath(queryFile, uploadPath));
+                FlyvarFileUtils.saveUploadFileAndGetFilePath(queryFile,
+                    pathUtils.getAbsoluteUploadFilesPath().toString()));
         }
         variations = Variation.convertInputToVariations(variationStr);
         if (variations == null) {
@@ -252,7 +254,8 @@ public class QueryController extends AbstractController {
         String regionStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(queryForm.getQueryInput())) {
             regionStr = FlyvarFileUtils.readFileToStringDiscardHeader(
-                FlyvarFileUtils.saveFileAndGetFilePath(queryFile, uploadPath));
+                FlyvarFileUtils.saveUploadFileAndGetFilePath(queryFile,
+                    pathUtils.getAbsoluteUploadFilesPath().toString()));
         }
         regions = VariationRegion.convertInputToRegions(regionStr);
         if (regions == null) {
@@ -284,7 +287,8 @@ public class QueryController extends AbstractController {
         String variationStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(queryForm.getQueryInput())) {
             variationStr = FlyvarFileUtils.readFileToStringDiscardHeader(
-                FlyvarFileUtils.saveFileAndGetFilePath(queryFile, uploadPath));
+                FlyvarFileUtils.saveUploadFileAndGetFilePath(queryFile,
+                    pathUtils.getAbsoluteUploadFilesPath().toString()));
         }
         if (StringUtils.isBlank(variationStr)) {
             model.addAttribute("queryForm", queryForm);
@@ -316,7 +320,8 @@ public class QueryController extends AbstractController {
         String variationStr = queryForm.getQueryInput();
         if (StringUtils.isBlank(queryForm.getQueryInput())) {
             variationStr = FlyvarFileUtils.readFileToStringDiscardHeader(
-                FlyvarFileUtils.saveFileAndGetFilePath(queryFile, uploadPath));
+                FlyvarFileUtils.saveUploadFileAndGetFilePath(queryFile,
+                    pathUtils.getAbsoluteUploadFilesPath().toString()));
         }
         if (StringUtils.isBlank(variationStr)) {
             model.addAttribute("queryForm", queryForm);

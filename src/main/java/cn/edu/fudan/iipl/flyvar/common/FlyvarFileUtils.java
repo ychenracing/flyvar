@@ -19,14 +19,6 @@ public class FlyvarFileUtils {
     private static final Logger logger = LoggerFactory.getLogger(FlyvarFileUtils.class);
 
     /**
-     * 获取项目根路径
-     * @return String形式的项目根路径
-     */
-    public static String getFlyvarRoot() {
-        return System.getProperty("flyvar.root");
-    }
-
-    /**
      * 读取用户的输入文件到字符串，丢弃以'#'开头的那些header信息
      * @return
      */
@@ -42,7 +34,7 @@ public class FlyvarFileUtils {
             "\n");
     }
 
-    public static Path saveFileAndGetFilePath(MultipartFile file, String uploadPath) {
+    public static Path saveUploadFileAndGetFilePath(MultipartFile file, String uploadPath) {
         String originName = file.getOriginalFilename();
         String baseName = FilenameUtils.getBaseName(originName);
         String extName = FilenameUtils.getExtension(originName);

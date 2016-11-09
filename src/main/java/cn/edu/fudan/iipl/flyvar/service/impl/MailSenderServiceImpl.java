@@ -24,7 +24,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
-import cn.edu.fudan.iipl.flyvar.common.FlyvarFileUtils;
+import cn.edu.fudan.iipl.flyvar.common.PathUtils;
 import cn.edu.fudan.iipl.flyvar.service.MailSenderService;
 import freemarker.template.Template;
 
@@ -39,6 +39,9 @@ public class MailSenderServiceImpl implements MailSenderService {
 
     @Value("${spring.mail.username:flyvar@sina.cn}")
     private String                 sender;
+
+    @Autowired
+    private PathUtils              pathUtils;
 
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
@@ -92,7 +95,7 @@ public class MailSenderServiceImpl implements MailSenderService {
                 imagePairs.stream().forEach(imagePair -> {
                     try {
                         helper.addInline(imagePair.getLeft(),
-                            Paths.get(FlyvarFileUtils.getFlyvarRoot(), imagePair.getRight()).toFile());
+                            Paths.get(pathUtils.getFlyvarRoot(), imagePair.getRight()).toFile());
                     } catch (MessagingException ex) {
                         logger.error("添加邮件内嵌图片失败！imagePair=" + imagePair, ex);
                     }
@@ -101,7 +104,7 @@ public class MailSenderServiceImpl implements MailSenderService {
 
             if (!CollectionUtils.isEmpty(attachmentFilePaths)) {
                 attachmentFilePaths.stream().forEach(attachmentFilePath -> {
-                    File file = Paths.get(FlyvarFileUtils.getFlyvarRoot(), attachmentFilePath).toFile();
+                    File file = Paths.get(pathUtils.getFlyvarRoot(), attachmentFilePath).toFile();
                     try {
                         // 这里的方法调用和插入图片是不同的，解决附件名称的中文问题
                         helper.addAttachment(MimeUtility.encodeWord(file.getName()), file);

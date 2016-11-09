@@ -11,7 +11,10 @@
 target
 
 # folder
-src/main/webapp/WEB-INF/file/
+src/main/webapp/WEB-INF/file/annotationFiles
+src/main/webapp/WEB-INF/file/scriptFiles
+src/main/webapp/WEB-INF/file/snpSamples
+src/main/webapp/WEB-INF/file/uploadFiles
 
 # ignore eclipse files
 .project
