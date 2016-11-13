@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.google.common.collect.Maps;
 
 import cn.edu.fudan.iipl.flyvar.common.DateUtils;
+import cn.edu.fudan.iipl.flyvar.common.PathUtils;
 import cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService;
 import cn.edu.fudan.iipl.flyvar.service.MailSenderService;
 
@@ -23,8 +24,12 @@ public class FlyvarMailSenderServiceImpl implements FlyvarMailSenderService {
     @Autowired
     private MailSenderService mailSenderService;
 
-    /* 
-     * @see cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService#sendSnpSample(java.util.List, java.lang.String)
+    @Autowired
+    private PathUtils         pathUtils;
+
+    /*
+     * @see cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService#sendSnpSample(java.util.List,
+     * java.lang.String)
      */
     @Override
     public void sendSnpSample(List<String> sampleNames, String receiver) {
@@ -33,9 +38,8 @@ public class FlyvarMailSenderServiceImpl implements FlyvarMailSenderService {
         String indexImageFilePath = "WEB-INF/static/images/flyvar.png";
         Pair<String, String> imagePair = new ImmutablePair<String, String>("flyvar-index",
             indexImageFilePath);
-        String sampleFolder = "WEB-INF/file/snpSamples";
         List<String> samplePaths = sampleNames.stream()
-            .map(sampleName -> Paths.get(sampleFolder, sampleName).toString())
+            .map(sampleName -> Paths.get(pathUtils.getSnpSamplesPath(), sampleName).toString())
             .collect(Collectors.toList());
         mailSenderService.asyncSend(subject, templateFilePath, getSampleParamMap(), receiver,
             Arrays.asList(imagePair), samplePaths);
@@ -43,7 +47,7 @@ public class FlyvarMailSenderServiceImpl implements FlyvarMailSenderService {
 
     private Map<String, Object> getSampleParamMap() {
         Map<String, Object> map = Maps.newHashMap();
-        map.put("date", DateUtils.formatGeneral(DateUtils.currentDate()));
+        map.put("date", DateUtils.formatGeneral(DateUtils.current()));
         return map;
     }
 

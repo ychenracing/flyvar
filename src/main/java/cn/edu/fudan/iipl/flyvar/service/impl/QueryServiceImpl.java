@@ -4,7 +4,6 @@
 package cn.edu.fudan.iipl.flyvar.service.impl;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -271,10 +270,8 @@ public class QueryServiceImpl implements QueryService {
 
     @Override
     public Path annotateResultVariation(Collection<QueryResultVariation> resultVariation) {
-
-        String annovarInputFileName = "";
-        Path resultPath = annotateService
-            .annotateVariationVcfFormat(Paths.get(annovarInputFileName));
+        Path vcfFilePath = annotateService.convertQueryResultVariationsToVcfFile(resultVariation);
+        Path resultPath = annotateService.annotateVcfFormatVariation(vcfFilePath);
         return resultPath;
     }
 

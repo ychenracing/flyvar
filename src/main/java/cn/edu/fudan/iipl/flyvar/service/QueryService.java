@@ -69,9 +69,10 @@ public interface QueryService {
                                                                 VariationDataBaseType variationDbType);
 
     /**
-     * annotate result variations. 
+     * annotate result variations.
+     * 
      * @param resultVariation
-     * @return saved file path for vcf format of result variations before annotation.
+     * @return saved file path in vcf format for result variations before annotating.
      */
     public Path annotateResultVariation(Collection<QueryResultVariation> resultVariation);
 

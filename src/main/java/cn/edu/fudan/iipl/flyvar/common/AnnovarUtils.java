@@ -3,6 +3,7 @@ package cn.edu.fudan.iipl.flyvar.common;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +16,14 @@ import com.google.common.collect.Lists;
  * annovar命令工具类。获取annovar命令时，
  * <ul>
  * <li>1. 需要将annovarCommand中annotationPathPlaceholder的内容替换为annotationPath的内容；</li>
- * <li>2. 需要将annovarCommand中variationVcfPlaceholder替换为vcf格式的variation文件的文件名，该文件必须位于annotationPath路径下；</li>
+ * <li>2.
+ * 需要将annovarCommand中variationVcfPlaceholder替换为vcf格式的variation文件的文件名，该文件必须位于annotationPath路径下；</li>
  * <li>3. 需要将annovarCommand中annovarInputSuffixPlaceholder替换为annovarInputSuffix的内容；</li>
  * <li>4. 需要将annovarCommand中annotateSuffixPlaceholder替换为annotateSuffix的内容；</li>
  * <li>5. 需要将annovarCommand中exonicAnnotateSuffixPlaceholder替换为exonicAnnotateSuffix的内容；</li>
  * <li>6. 需要将annovarCommand中combineAnnovarOutSuffixPlaceholder替换为combineAnnovarOutSuffix的内容；</li>
  * </ul>
+ * 
  * @author racing
  * @version $Id: AnnovarUtils.java, v 0.1 2016年11月09日 下午13:37:16 racing Exp $
  */
@@ -72,31 +75,37 @@ public class AnnovarUtils {
     @Value("${annovar.combineAnnovarOutSuffix}")
     private String    combineAnnovarOutSuffix;
 
+    @Value("${annovar.invalidInputSuffix}")
+    private String    invalidInputSuffix;
+
     @Autowired
     private PathUtils pathUtils;
 
     /**
-     * 获取annovar命令。其中，所有文件和目录都使用绝对路径。命令配置在属性文件中，路径部分使用占位符，读取之后把占位符替换为真实路径。
+     * 获取annovar命令。 需要进行annovate的文件必须位于annotatePath目录下。
+     * 其中，所有文件和目录都使用绝对路径。命令配置在属性文件中，路径部分使用占位符，读取之后把占位符替换为真实路径。
+     * 
      * @param annovarInputFileName
      * @return
      */
     public List<String> getAnnovarCommands(String annovarInputFileName) {
-        Path flyvarRootPath = Paths.get(pathUtils.getFlyvarRoot()).toAbsolutePath();
+
         List<String> commands = Lists.newArrayList(getAnnovarCommand1(), getAnnovarCommand2(),
             getAnnovarCommand3());
-        return commands.stream()
-            .map(
-                command -> command
-                    .replaceAll(getAnnotationPathPlaceholder(),
-                        flyvarRootPath.resolveSibling(getAnnotationPath()).toAbsolutePath()
-                            .toString())
-                    .replaceAll(getVariationVcfPlaceholder(), annovarInputFileName)
-                    .replaceAll(getAnnovarInputSuffixPlaceholder(), getAnnovarInputSuffix())
-                    .replaceAll(getAnnotateSuffixPlaceholder(), getAnnotateSuffix())
-                    .replaceAll(getExonicAnnotateSuffixPlaceholder(), getExonicAnnotateSuffix())
-                    .replaceAll(getCombineAnnovarOutSuffixPlaceholder(),
-                        getCombineAnnovarOutSuffix()))
+        return commands.stream().map(replaceCommandPlaceholder(annovarInputFileName))
             .collect(Collectors.toList());
+    }
+
+    private Function<String, String> replaceCommandPlaceholder(String annovarInputFileName) {
+        return command -> command
+            .replaceAll(getAnnotationPathPlaceholder(),
+                Paths.get(pathUtils.getFlyvarRoot(), getAnnotationPath()).toAbsolutePath()
+                    .toString())
+            .replaceAll(getVariationVcfPlaceholder(), annovarInputFileName)
+            .replaceAll(getAnnovarInputSuffixPlaceholder(), getAnnovarInputSuffix())
+            .replaceAll(getAnnotateSuffixPlaceholder(), getAnnotateSuffix())
+            .replaceAll(getExonicAnnotateSuffixPlaceholder(), getExonicAnnotateSuffix())
+            .replaceAll(getCombineAnnovarOutSuffixPlaceholder(), getCombineAnnovarOutSuffix());
     }
 
     public String getAnnotationPathPlaceholder() {
@@ -163,6 +172,18 @@ public class AnnovarUtils {
         this.annovarInputSuffix = annovarInputSuffix;
     }
 
+    /**
+     * Get the path to annovar input file by the variation file name being annotated. Being
+     * annovated file must be put in the directory of annovar's annotationPath.
+     * 
+     * @param annovarInputFileName
+     * @return
+     */
+    public Path getAnnovarInputPath(String annovarInputFileName) {
+        return Paths.get(pathUtils.getFlyvarRoot(), getAnnotationPath(),
+            annovarInputFileName + getAnnovarInputSuffix());
+    }
+
     public String getAnnotateSuffixPlaceholder() {
         return annotateSuffixPlaceholder;
     }
@@ -179,6 +200,18 @@ public class AnnovarUtils {
         this.annotateSuffix = annotateSuffix;
     }
 
+    /**
+     * Get the path to variation function file by the variation file name being annotated. Being
+     * annovated file must be put in the directory of annovar's annotationPath.
+     * 
+     * @param annovarInputFileName
+     * @return
+     */
+    public Path getAnnotatePath(String annovarInputFileName) {
+        return Paths
+            .get(getAnnovarInputPath(annovarInputFileName).toString() + getAnnotateSuffix());
+    }
+
     public String getExonicAnnotateSuffixPlaceholder() {
         return exonicAnnotateSuffixPlaceholder;
     }
@@ -189,6 +222,17 @@ public class AnnovarUtils {
 
     public String getExonicAnnotateSuffix() {
         return exonicAnnotateSuffix;
+    }
+
+    /**
+     * Get the path to exonic variation function file by the variation file name being annotated.
+     * Being annovated file must be put in the directory of annovar's annotationPath.
+     * 
+     * @param annovarInputFileName
+     * @return
+     */
+    public Path getExonicAnnotatePath(String annovarInputFileName) {
+        return Paths.get(getAnnovarInputPath(annovarInputFileName) + getExonicAnnotateSuffix());
     }
 
     public void setExonicAnnotateSuffix(String exonicAnnotateSuffix) {
@@ -207,8 +251,39 @@ public class AnnovarUtils {
         return combineAnnovarOutSuffix;
     }
 
+    /**
+     * Get the path to combine annovar output file by the variation file name being annotated. Being
+     * annovated file must be put in the directory of annovar's annotationPath.
+     * 
+     * @param annovarInputFileName
+     * @return
+     */
+    public Path getCombineAnnovarOutPath(String annovarInputFileName) {
+        return Paths.get(pathUtils.getFlyvarRoot(), getAnnotationPath(),
+            annovarInputFileName + getCombineAnnovarOutSuffix());
+    }
+
     public void setCombineAnnovarOutSuffix(String combineAnnovarOutSuffix) {
         this.combineAnnovarOutSuffix = combineAnnovarOutSuffix;
+    }
+
+    /**
+     * Get the path to annovar invalid input file by the variation file name being annotated. Being
+     * annovated file must be put in the directory of annovar's annotationPath.
+     * 
+     * @param annovarInputFileName
+     * @return
+     */
+    public Path getAnnovarInvalidInputPath(String annovarInputFileName) {
+        return Paths.get(getAnnovarInputPath(annovarInputFileName) + getInvalidInputSuffix());
+    }
+
+    public String getInvalidInputSuffix() {
+        return invalidInputSuffix;
+    }
+
+    public void setInvalidInputSuffix(String invalidInputSuffix) {
+        this.invalidInputSuffix = invalidInputSuffix;
     }
 
 }

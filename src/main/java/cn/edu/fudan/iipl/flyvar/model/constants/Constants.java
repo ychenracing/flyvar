@@ -23,4 +23,10 @@ public class Constants {
     /** exon region的gene name对应的那些variations的缓存key */
     public static final String CACHE_GENE_NAME_EXON_VARIATION_REGIONS     = "CACHE_GENE_NAME_EXON_REGION_VARIATION_REGIONS_";
 
+    /** sample文件内容对应的缓存key */
+    public static final String CACHE_SAMPLE_VARIATIONS                    = "CACHE_SAMPLE_VARIATIONS_";
+
+    /** sample文件对应的annotate缓存结果的缓存key */
+    public static final String CACHE_SAMPLE_ANNOTATE_RESULT               = "CACHE_SAMPLE_ANNOTATE_RESULT_";
+
 }

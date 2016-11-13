@@ -4,13 +4,18 @@
 package cn.edu.fudan.iipl.flyvar.model;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
@@ -135,6 +140,18 @@ public class Variation implements Comparable<Variation>, Serializable {
             result.add(variation);
         }
         return result;
+    }
+
+    public static String convertToVcfLine(Variation variation) {
+        return StringUtils.join(
+            Lists.<String> newArrayList(variation.getChr(), String.valueOf(variation.getPos()), ".",
+                variation.getRef(), variation.getAlt(), ".", ".", ".", ".", "."),
+            "\t");
+    }
+
+    public static List<String> convertToVcfLines(Collection<Variation> variations) {
+        return variations.stream().map(variation -> convertToVcfLine(variation))
+            .collect(Collectors.toList());
     }
 
     @Override

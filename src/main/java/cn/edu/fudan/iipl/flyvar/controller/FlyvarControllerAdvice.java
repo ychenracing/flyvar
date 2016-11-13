@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 
 import cn.edu.fudan.iipl.flyvar.AbstractController;
 import cn.edu.fudan.iipl.flyvar.exception.FlyvarSystemException;
+import cn.edu.fudan.iipl.flyvar.exception.NotFoundException;
 import cn.edu.fudan.iipl.flyvar.model.constants.ErrorType;
 
 /**
@@ -38,6 +39,8 @@ public class FlyvarControllerAdvice extends AbstractController {
         .getLogger(FlyvarControllerAdvice.class);
 
     private static final String SYSTEM_ERROR_JSP = "error/500";
+
+    private static final String NOT_FOUND_JSP    = "error/404";
 
     @ExceptionHandler(value = { IllegalArgumentException.class })
     @ResponseStatus(value = HttpStatus.OK)
@@ -71,6 +74,14 @@ public class FlyvarControllerAdvice extends AbstractController {
                                          HttpServletResponse response) {
         logger.info(getClientIP(request) + " " + error.getMessage());
         return SYSTEM_ERROR_JSP;
+    }
+
+    @ExceptionHandler(value = { NotFoundException.class })
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public String processNotFoundException(NotFoundException error, HttpServletRequest request,
+                                           HttpServletResponse response) {
+        logger.info(getClientIP(request) + " " + error.getMessage());
+        return NOT_FOUND_JSP;
     }
 
     @ExceptionHandler(value = { Exception.class })

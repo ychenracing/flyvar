@@ -9,7 +9,7 @@
 <head>
 <base href="${basePath}">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>FlyVar</title>
+<title>Query</title>
 <%@ include file="../common/sheet_js.jsp"%>
 </head>
 <body>

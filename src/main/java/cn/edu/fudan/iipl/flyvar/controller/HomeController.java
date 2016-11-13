@@ -52,7 +52,7 @@ public class HomeController extends AbstractController {
 		checkReferer(request);
 		Map<String, Object> result = Maps.newHashMap();
 		VisitLog visitLog = new VisitLog(getClientIP(request),
-				DateUtils.formatGeneral(DateUtils.currentDate()));
+				DateUtils.formatGeneral(DateUtils.current()));
 		HttpSession session = request.getSession();
 		if (session == null) {
 			logger.info("新访问记录: visitLog={}", visitLog);

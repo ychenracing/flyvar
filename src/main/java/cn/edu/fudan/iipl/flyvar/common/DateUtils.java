@@ -8,6 +8,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 日期工具类
  * 
@@ -15,6 +18,8 @@ import java.util.Date;
  * @version $Id: DateUtils.java, v 0.1 2016年10月23日 下午4:05:29 racing Exp $
  */
 public class DateUtils {
+
+    private static final Logger logger           = LoggerFactory.getLogger(DateUtils.class);
 
     private static final String GENERAL_PATTERN  = "yyyy-MM-dd HH:mm:ss";
 
@@ -42,11 +47,14 @@ public class DateUtils {
         try {
             result = df.parse(dateStr);
         } catch (ParseException e) {
+            logger.error(
+                "Parse date to certain pattern error! dataStr=" + dateStr + " pattern=" + pattern,
+                e);
         }
         return result;
     }
 
-    public static Date currentDate() {
+    public static Date current() {
         return new Date();
     }
 

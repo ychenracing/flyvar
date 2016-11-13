@@ -16,13 +16,24 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class FlyvarFileUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlyvarFileUtils.class);
+    private static final Logger logger                     = LoggerFactory
+        .getLogger(FlyvarFileUtils.class);
+
+    private static final String GENERATED_FILE_NAME_PREFIX = "generated_file_";
+
+    private static final String DEFAULT_GENERATED_FILE_EXT = ".txt";
 
     /**
      * 读取用户的输入文件到字符串，丢弃以'#'开头的那些header信息
+     * 
      * @return
      */
     public static String readFileToStringDiscardHeader(Path filePath) {
+        if (!filePath.toFile().exists()) {
+            logger.warn("file not exists! cannot read file to String discard header! filePath={}",
+                filePath);
+            return null;
+        }
         List<String> lines = null;
         try {
             lines = FileUtils.readLines(filePath.toFile(), "utf-8");
@@ -38,12 +49,11 @@ public class FlyvarFileUtils {
         String originName = file.getOriginalFilename();
         String baseName = FilenameUtils.getBaseName(originName);
         String extName = FilenameUtils.getExtension(originName);
-        StringBuilder newFileName = new StringBuilder(
-            DateUtils.formatFilename(DateUtils.currentDate())).append("_").append(baseName)
-                .append("_").append(System.currentTimeMillis()).append("_")
-                .append(RandomUtils.nextInt(0, 1000)).append("_")
-                .append(RandomUtils.nextInt(0, 1000)).append("_")
-                .append(RandomUtils.nextInt(0, 1000)).append(".").append(extName);
+        StringBuilder newFileName = new StringBuilder(baseName).append("_")
+            .append(DateUtils.formatFilename(DateUtils.current())).append("_")
+            .append(System.currentTimeMillis()).append("_").append(RandomUtils.nextInt(0, 1000))
+            .append("_").append(RandomUtils.nextInt(0, 1000)).append("_")
+            .append(RandomUtils.nextInt(0, 1000)).append(".").append(extName);
         Path savePath = Paths.get(uploadPath, newFileName.toString());
         try {
             file.transferTo(savePath.toFile());
@@ -62,6 +72,15 @@ public class FlyvarFileUtils {
             logger.error("write lines to file error! path=" + path, ex);
         }
         return path;
+    }
+
+    public static String getGeneratedFileName(String prefix, String ext) {
+        return new StringBuilder(StringUtils.isBlank(prefix) ? "" : prefix)
+            .append(GENERATED_FILE_NAME_PREFIX)
+            .append(DateUtils.formatFilename(DateUtils.current())).append("_")
+            .append(System.currentTimeMillis()).append("_").append(RandomUtils.nextInt(0, 1000))
+            .append(RandomUtils.nextInt(0, 1000)).append(RandomUtils.nextInt(0, 1000))
+            .append(StringUtils.isBlank(ext) ? DEFAULT_GENERATED_FILE_EXT : ext).toString();
     }
 
 }

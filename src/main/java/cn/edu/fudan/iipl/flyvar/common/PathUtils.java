@@ -12,6 +12,7 @@ public class PathUtils {
     @Value("${file.uploadFilesPath}")
     private String uploadFilesPath;
 
+    /** 与annovarUtils的annotationPath一样 */
     @Value("${file.annotationFilesPath}")
     private String annotationFilesPath;
 
@@ -23,6 +24,7 @@ public class PathUtils {
 
     /**
      * 获取项目根路径
+     * 
      * @return String形式的项目根路径
      */
     public String getFlyvarRoot() {
