@@ -177,8 +177,7 @@ public class QueryController extends AbstractController {
         return success ? "redirect:/annotate/result.htm" : QUERY_JSP;
     }
 
-    @RequestMapping(value = { "/query/result.htm" }, method = { RequestMethod.GET,
-                                                                RequestMethod.POST })
+    @RequestMapping(value = { "/query/result.htm" }, method = { RequestMethod.GET })
     public String showQueryResults(HttpServletRequest request, Model model) {
         checkReferer(request);
         if (!model.containsAttribute("queryResults")) {
@@ -187,14 +186,19 @@ public class QueryController extends AbstractController {
         return QUERY_RESULT_JSP;
     }
 
-    @RequestMapping(value = { "/query/sample/success.htm" }, method = { RequestMethod.GET,
-                                                                        RequestMethod.POST })
+    @RequestMapping(value = { "/query/sample/success.htm" }, method = { RequestMethod.GET })
     public String bySampleResult(HttpServletRequest request, Model model) {
         checkReferer(request);
         if (!model.containsAttribute("success")) {
             throw new RuntimeException("Invalid access!");
         }
         return QUERY_BY_SAMPLE_RESULT_JSP;
+    }
+
+    @RequestMapping(value = { "/query/sample/list.htm" }, method = { RequestMethod.GET })
+    private String variationSampleList() {
+        // TODO: sample list for a variation
+        return null;
     }
 
     private boolean validateQueryParams(HttpServletRequest request, @Valid QueryForm queryForm,

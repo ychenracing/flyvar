@@ -89,14 +89,14 @@
 						</div>
 						<div class="row">
 							<label class="radio inline-block"> <form:radiobutton
-									id="dispensible_yes" path="removeDispensible" value="1" /> Yes
+									id="dispensable_yes" path="removeDispensable" value="1" /> Yes
 							</label> <label class="radio inline-block"> <form:radiobutton
-									id="dispensible_no" path="removeDispensible" value="2"
+									id="dispensable_no" path="removeDispensable" value="2"
 									checked="checked" /> No
 							</label>
 						</div>
 
-						<form:errors path="removeDispensible" cssClass="error" />
+						<form:errors path="removeDispensable" cssClass="error" />
 					</div>
 				</div>
 

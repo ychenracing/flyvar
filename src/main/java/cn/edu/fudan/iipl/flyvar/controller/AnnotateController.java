@@ -70,7 +70,7 @@ public class AnnotateController extends AbstractController {
     @Autowired
     private AnnotateService     annotateService;
 
-    @RequestMapping(value = { "/annotate.htm" }, method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = { "/annotate.htm" }, method = { RequestMethod.GET })
     public String showAnnotate(Model model) {
         model.addAttribute("annotateForm", new AnnotateForm());
         return ANNOTATE_JSP;

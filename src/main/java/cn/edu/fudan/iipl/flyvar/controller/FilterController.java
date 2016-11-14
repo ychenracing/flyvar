@@ -49,7 +49,7 @@ public class FilterController extends AbstractController {
     @Autowired
     private CacheService        cacheService;
 
-    @RequestMapping(value = { "/filter.htm" }, method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = { "/filter.htm" }, method = { RequestMethod.GET })
     public String showAnnotate(Model model) {
         model.addAttribute("filterForm", new FilterForm());
         return FILTER_JSP;

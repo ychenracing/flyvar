@@ -24,12 +24,12 @@ public class FilterForm implements Serializable {
     private Integer           variationDb;
 
     /** 查询类型 */
-    @NotNull(message = "{error.annotate.inputFormatType}")
+    @NotNull(message = "{error.filter.inputFormatType}")
     private Integer           inputFormatType;
 
     /** 是否移除dispensible gene的variation */
-    @NotNull(message = "{error.annotate.removeDispensible}")
-    private Integer           removeDispensible;
+    @NotNull(message = "{error.filter.removeDispensable}")
+    private Integer           removeDispensable;
 
     /** 查询输入 */
     private String            filterInput;
@@ -50,12 +50,12 @@ public class FilterForm implements Serializable {
         this.inputFormatType = inputFormatType;
     }
 
-    public Integer getRemoveDispensible() {
-        return removeDispensible;
+    public Integer getRemoveDispensable() {
+        return removeDispensable;
     }
 
-    public void setRemoveDispensible(Integer removeDispensible) {
-        this.removeDispensible = removeDispensible;
+    public void setRemoveDispensible(Integer removeDispensable) {
+        this.removeDispensable = removeDispensable;
     }
 
     public String getFilterInput() {
