@@ -6,6 +6,7 @@ package cn.edu.fudan.iipl.flyvar.common;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -56,6 +57,17 @@ public class DateUtils {
 
     public static Date current() {
         return new Date();
+    }
+
+    public static Date addDay(Date date, int count) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(Calendar.DAY_OF_YEAR, count);
+        return c.getTime();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(formatGeneral(addDay(current(), -30)));
     }
 
 }

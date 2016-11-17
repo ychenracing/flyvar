@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -30,56 +32,58 @@ import com.google.common.collect.Lists;
 @Component
 public class AnnovarUtils {
 
+    private static final Logger logger = LoggerFactory.getLogger(AnnovarUtils.class);
+
     /** annotate目录在属性文件中的占位符名称，用于定位annotate目录并且用绝对路径替换占位符 */
     @Value("${annovar.annotationPathPlaceholder}")
-    private String    annotationPathPlaceholder;
+    private String              annotationPathPlaceholder;
 
     /** 运行annotate的目录，用于定位annotate的脚本文件和输入输出文件 */
     @Value("${annovar.annotationPath}")
-    private String    annotationPath;
+    private String              annotationPath;
 
     /** 运行annotate的输入文件的文件名，vcf格式 */
     @Value("${annovar.variationVcfPlaceholder}")
-    private String    variationVcfPlaceholder;
+    private String              variationVcfPlaceholder;
 
     @Value("${annovar.command1}")
-    private String    annovarCommand1;
+    private String              annovarCommand1;
 
     @Value("${annovar.command2}")
-    private String    annovarCommand2;
+    private String              annovarCommand2;
 
     @Value("${annovar.command3}")
-    private String    annovarCommand3;
+    private String              annovarCommand3;
 
     @Value("${annovar.annovarInputSuffixPlaceholder}")
-    private String    annovarInputSuffixPlaceholder;
+    private String              annovarInputSuffixPlaceholder;
 
     @Value("${annovar.annovarInputSuffix}")
-    private String    annovarInputSuffix;
+    private String              annovarInputSuffix;
 
     @Value("${annovar.annotateSuffixPlaceholder}")
-    private String    annotateSuffixPlaceholder;
+    private String              annotateSuffixPlaceholder;
 
     @Value("${annovar.annotateSuffix}")
-    private String    annotateSuffix;
+    private String              annotateSuffix;
 
     @Value("${annovar.exonicAnnotateSuffixPlaceholder}")
-    private String    exonicAnnotateSuffixPlaceholder;
+    private String              exonicAnnotateSuffixPlaceholder;
 
     @Value("${annovar.exonicAnnotateSuffix}")
-    private String    exonicAnnotateSuffix;
+    private String              exonicAnnotateSuffix;
 
     @Value("${annovar.combineAnnovarOutSuffixPlaceholder}")
-    private String    combineAnnovarOutSuffixPlaceholder;
+    private String              combineAnnovarOutSuffixPlaceholder;
 
     @Value("${annovar.combineAnnovarOutSuffix}")
-    private String    combineAnnovarOutSuffix;
+    private String              combineAnnovarOutSuffix;
 
     @Value("${annovar.invalidInputSuffix}")
-    private String    invalidInputSuffix;
+    private String              invalidInputSuffix;
 
     @Autowired
-    private PathUtils pathUtils;
+    private PathUtils           pathUtils;
 
     /**
      * 获取annovar命令。 需要进行annovate的文件必须位于annotatePath目录下。
@@ -97,15 +101,18 @@ public class AnnovarUtils {
     }
 
     private Function<String, String> replaceCommandPlaceholder(String annovarInputFileName) {
-        return command -> command
-            .replaceAll(getAnnotationPathPlaceholder(),
-                Paths.get(pathUtils.getFlyvarRoot(), getAnnotationPath()).toAbsolutePath()
-                    .toString())
-            .replaceAll(getVariationVcfPlaceholder(), annovarInputFileName)
-            .replaceAll(getAnnovarInputSuffixPlaceholder(), getAnnovarInputSuffix())
-            .replaceAll(getAnnotateSuffixPlaceholder(), getAnnotateSuffix())
-            .replaceAll(getExonicAnnotateSuffixPlaceholder(), getExonicAnnotateSuffix())
-            .replaceAll(getCombineAnnovarOutSuffixPlaceholder(), getCombineAnnovarOutSuffix());
+        return command -> {
+            String returnedCommand = command
+                .replaceAll(getAnnotationPathPlaceholder(),
+                    Paths.get(pathUtils.getFlyvarRoot(), getAnnotationPath()).toAbsolutePath()
+                        .toString().replaceAll("\\\\", "/"))
+                .replaceAll(getVariationVcfPlaceholder(), annovarInputFileName)
+                .replaceAll(getAnnovarInputSuffixPlaceholder(), getAnnovarInputSuffix())
+                .replaceAll(getAnnotateSuffixPlaceholder(), getAnnotateSuffix())
+                .replaceAll(getExonicAnnotateSuffixPlaceholder(), getExonicAnnotateSuffix())
+                .replaceAll(getCombineAnnovarOutSuffixPlaceholder(), getCombineAnnovarOutSuffix());
+            return returnedCommand;
+        };
     }
 
     public String getAnnotationPathPlaceholder() {

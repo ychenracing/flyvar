@@ -2,16 +2,19 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:util="http://www.springframework.org/schema/util" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-	xmlns:cache="http://www.springframework.org/schema/cache" xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
 	xsi:schemaLocation="  
     http://www.springframework.org/schema/context  
     http://www.springframework.org/schema/context/spring-context.xsd  
     http://www.springframework.org/schema/beans  
     http://www.springframework.org/schema/beans/spring-beans.xsd  
     http://www.springframework.org/schema/tx  
-    http://www.springframework.org/schema/tx/spring-tx.xsd  
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/task
+	http://www.springframework.org/schema/task/spring-task.xsd
     http://www.springframework.org/schema/jdbc  
     http://www.springframework.org/schema/jdbc/spring-jdbc-4.1.xsd  
     http://www.springframework.org/schema/data/mongo
@@ -32,11 +35,16 @@
 		<property name="locations">
 			<list>
 				<value>classpath:cn/edu/fudan/iipl/flyvar/db/jdbc.properties</value>
-				<value>classpath:cn/edu/fudan/iipl/flyvar/db/mongo.properties</value>
-				<value>classpath:cn/edu/fudan/iipl/flyvar/cache/redis.properties</value>
-				<value>classpath:cn/edu/fudan/iipl/flyvar/mail/mail.properties</value>
-				<value>classpath:cn/edu/fudan/iipl/flyvar/file/file.properties</value>
-				<value>classpath:cn/edu/fudan/iipl/flyvar/annovar/annovar.properties</value>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/db/mongo.properties
+				</value>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/cache/redis.properties
+				</value>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/mail/mail.properties
+				</value>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/file/file.properties
+				</value>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/annovar/annovar.properties
+				</value>
 			</list>
 		</property>
 	</bean>
@@ -64,10 +72,13 @@
 		<property name="password" value="${spring.mail.password}" />
 		<property name="javaMailProperties">
 			<props>
-				<prop key="mail.transport.protocol">${spring.mail.properties.mail.transport.protocol}</prop>
+				<prop key="mail.transport.protocol">${spring.mail.properties.mail.transport.protocol}
+				</prop>
 				<prop key="mail.smtp.auth">${spring.mail.properties.mail.smtp.auth}</prop>
-				<prop key="mail.smtp.starttls.enable">${spring.mail.properties.mail.smtp.starttls.enable}</prop>
-				<prop key="mail.smtp.starttls.required">${spring.mail.properties.mail.smtp.starttls.required}</prop>
+				<prop key="mail.smtp.starttls.enable">${spring.mail.properties.mail.smtp.starttls.enable}
+				</prop>
+				<prop key="mail.smtp.starttls.required">${spring.mail.properties.mail.smtp.starttls.required}
+				</prop>
 				<prop key="mail.debug">${spring.mail.properties.mail.debug}</prop>
 			</props>
 		</property>
@@ -217,5 +228,15 @@
 	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager"
 		p:cacheManager-ref="ehCacheManagerFactory" />
 
+	<bean id="taskScheduler"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler">
+		<property name="poolSize" value="5" />
+	</bean>
+
+	<task:scheduled-tasks scheduler="taskScheduler">
+		<!-- every day 00:00:00 -->
+		<task:scheduled ref="annotateFileScheduler" method="doTask"
+			cron="0 0 0 */1 * ?" />
+	</task:scheduled-tasks>
 
 </beans>

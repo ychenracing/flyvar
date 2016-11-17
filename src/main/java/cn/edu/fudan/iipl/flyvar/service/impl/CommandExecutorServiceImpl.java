@@ -27,12 +27,14 @@ public class CommandExecutorServiceImpl implements CommandExecutorService {
 
     @Override
     public void execute(String command) {
+        List<String> commands = Lists.newArrayList();
         try {
-            List<String> commands = Lists.newArrayList();
             if (!isWindows()) {
-                commands.addAll(Arrays.asList("/bin/bash", "-cl")); // use bash on non-windows machine
+                commands.addAll(Arrays.asList("/bin/bash", "-cl")); // use bash on non-windows machines
+            } else {
+                commands.addAll(Arrays.asList("cmd", "/c")); // use cmd on windows machine
             }
-            commands.add(command);
+            commands.addAll(Arrays.asList(command.split("\\s+")));
             ProcessBuilder processBuilder = new ProcessBuilder(commands);
             Process process = processBuilder.start();
 
