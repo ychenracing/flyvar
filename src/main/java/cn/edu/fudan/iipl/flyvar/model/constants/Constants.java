@@ -11,6 +11,9 @@ public class Constants {
     /** 数据库中是否有该variation的缓存key */
     public static final String CACHE_VARIATION_EXIST_IN_DB                = "CACHE_VARIATION_EXIST_IN_DB_";
 
+    /** Dispensable gene数据库中是否有该variation的缓存key */
+    public static final String CACHE_VARIATION_EXIST_IN_DISPENSABLE_GENE  = "CACHE_VARIATION_EXIST_IN_DISPENSABLE_GENE_";
+
     /** 多少sample name中有该有该variation的缓存key */
     public static final String CACHE_COUNT_SAMPLE_NAME_CONTAINS_VARIATION = "CACHE_QUERY_COUNT_SAMPLE_NAME_CONTAINS_VARIATION_";
 

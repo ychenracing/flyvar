@@ -14,11 +14,9 @@ import org.apache.commons.lang3.StringUtils;
  */
 public enum GeneNameType {
 
-                          FLYBASE_ID(1, "flyvase id",
-                                     "FBgn\\d+"), ANNOTATION_SYMBOL(2, "annotation symbol",
-                                                                    "C[A-Z]\\d+"), SYMBOL(3,
-                                                                                          "symbol",
-                                                                                          "[a-zA-Z].*");
+    FLYBASE_ID(1, "flyvase id", "FBgn\\d+"), 
+    ANNOTATION_SYMBOL(2, "annotation symbol", "C[A-Z]\\d+"), 
+    SYMBOL(3, "symbol", "[a-zA-Z].*");
 
     private int    code;
     private String desc;
@@ -57,7 +55,7 @@ public enum GeneNameType {
     public static GeneNameType of(int code) {
         if (code < 0)
             return null;
-        for (GeneNameType item : GeneNameType.values()) {
+        for (GeneNameType item : values()) {
             if (item.code == code) {
                 return item;
             }
@@ -68,7 +66,7 @@ public enum GeneNameType {
     public static GeneNameType of(String geneName) {
         if (StringUtils.isBlank(geneName))
             return null;
-        for (GeneNameType item : GeneNameType.values()) {
+        for (GeneNameType item : values()) {
             if (geneName.matches(item.getPattern())) {
                 return item;
             }

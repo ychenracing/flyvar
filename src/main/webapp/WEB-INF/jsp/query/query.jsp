@@ -109,8 +109,8 @@
 							</div>
 						</div>
 						<div id="div_choose_a_file" class="row">
-							<div class="row">Or Choose from a file:</div>
-							<div class="row">
+							<div class="">Or Choose from a file:</div>
+							<div class="">
 								<input id="query_file" name="queryFile" type="file" class="file"
 									data-show-preview="false">
 							</div>

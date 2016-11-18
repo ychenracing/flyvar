@@ -45,7 +45,6 @@ public class AnnotateServiceImpl implements AnnotateService {
         Path annotationFolderPath = Paths.get(pathUtils.getFlyvarRoot(),
             annovarUtils.getAnnotationPath());
         if (!annotationFolderPath.equals(vcfFormatVariationPath.getParent())) {
-            System.out.println(annotationFolderPath);
             logger.error(
                 "The file to annotate is not in the directory of annovationPath. variationFilePath={}",
                 vcfFormatVariationPath);

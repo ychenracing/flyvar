@@ -42,7 +42,7 @@ public enum QueryType {
     }
 
     public static QueryType of(int code) {
-        for (QueryType item : QueryType.values()) {
+        for (QueryType item : values()) {
             if (item.getCode() == code) {
                 return item;
             }

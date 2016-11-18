@@ -67,8 +67,8 @@
 								placeholder="The format of input: chr pos ref var. You can input multiple variations with one variation in a single line." />
 						</div>
 						<div id="div_choose_a_file" class="row">
-							<div class="row">Or Choose from a file:</div>
-							<div class="row">
+							<div class="">Or Choose from a file:</div>
+							<div class="">
 								<input id="annotate_file" name="annotateFile" type="file" class="file"
 									data-show-preview="false">
 							</div>

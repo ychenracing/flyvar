@@ -46,8 +46,8 @@
 				enctype="multipart/form-data">
 				<div class="row">
 					<div
-						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left vertical-center">choose
-						database</div>
+						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left vertical-center">
+						choose database</div>
 					<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right">
 						<label class="radio"> <form:radiobutton id="db_dgrp"
 								path="variationDb" value="1" checked="checked" /> DGRP
@@ -81,16 +81,17 @@
 				<div class="row">
 					<div
 						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left vertical-center">alternative
-						choices</div>
-					<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right">
+						choice</div>
+					<div
+						class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right form-group">
 						<div class="row">
-							<span class="text-justify"><strong>Would you want to remove
-								variations within dispensable gene regions?</strong></span>
+							<span class="text-justify"><strong>Would you want
+									to remove variations within dispensable gene regions?</strong></span>
 						</div>
-						<div class="row">
-							<label class="radio inline-block"> <form:radiobutton
+						<div class="">
+							<label class="radio"> <form:radiobutton
 									id="dispensable_yes" path="removeDispensable" value="1" /> Yes
-							</label> <label class="radio inline-block"> <form:radiobutton
+							</label> <label class="radio"> <form:radiobutton
 									id="dispensable_no" path="removeDispensable" value="2"
 									checked="checked" /> No
 							</label>
@@ -112,8 +113,8 @@
 								placeholder="The format of input: chr pos ref var. You can input multiple variations with one variation in a single line." />
 						</div>
 						<div id="div_choose_a_file" class="row">
-							<div class="row">Or Choose from a file:</div>
-							<div class="row">
+							<div class="">Or Choose from a file:</div>
+							<div class="">
 								<input id="filter_file" name="filterFile" type="file"
 									class="file" data-show-preview="false">
 							</div>

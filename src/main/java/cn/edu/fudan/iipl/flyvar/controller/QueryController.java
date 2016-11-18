@@ -180,7 +180,7 @@ public class QueryController extends AbstractController {
     @RequestMapping(value = { "/query/result.htm" }, method = { RequestMethod.GET })
     public String showQueryResults(HttpServletRequest request, Model model) {
         checkReferer(request);
-        if (!model.containsAttribute("queryResults")) {
+        if (!model.containsAttribute("queryResult")) {
             throw new RuntimeException("Invalid access!");
         }
         return QUERY_RESULT_JSP;
@@ -265,7 +265,7 @@ public class QueryController extends AbstractController {
         }
         List<QueryResultVariation> queryResult = queryService.queryByVariation(variations,
             VariationDataBaseType.of(queryForm.getVariationDb()));
-        redirectModel.addFlashAttribute("queryResults", queryResult);
+        redirectModel.addFlashAttribute("queryResult", queryResult);
         redirectModel.addFlashAttribute("queryType", queryForm.getVariationDb());
         return true;
     }
@@ -416,7 +416,7 @@ public class QueryController extends AbstractController {
         }
         List<QueryResultVariation> queryResult = queryService.queryByRegion(regions,
             VariationDataBaseType.of(queryForm.getVariationDb()));
-        redirectModel.addFlashAttribute("queryResults", queryResult);
+        redirectModel.addFlashAttribute("queryResult", queryResult);
         redirectModel.addFlashAttribute("queryType", queryForm.getVariationDb());
         return true;
     }
@@ -506,7 +506,7 @@ public class QueryController extends AbstractController {
         List<String> geneNames = Lists.newArrayList(variationStr.split("\\s+"));
         List<QueryResultVariation> queryResult = queryService.queryByGeneNameWholeRegion(geneNames,
             VariationDataBaseType.of(queryForm.getVariationDb()));
-        redirectModel.addFlashAttribute("queryResults", queryResult);
+        redirectModel.addFlashAttribute("queryResult", queryResult);
         redirectModel.addFlashAttribute("queryType", queryForm.getVariationDb());
         return true;
     }
@@ -595,7 +595,7 @@ public class QueryController extends AbstractController {
         List<String> geneNames = Lists.newArrayList(variationStr.split("\\s+"));
         List<QueryResultVariation> queryResult = queryService.queryByGeneNameExonRegion(geneNames,
             VariationDataBaseType.of(queryForm.getVariationDb()));
-        redirectModel.addFlashAttribute("queryResults", queryResult);
+        redirectModel.addFlashAttribute("queryResult", queryResult);
         redirectModel.addFlashAttribute("queryType", queryForm.getVariationDb());
         return true;
     }

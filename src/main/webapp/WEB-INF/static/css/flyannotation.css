@@ -23,7 +23,9 @@
 }
 
 .vertical-center {
-	vertical-align: middle !important;
+  min-height:30px;
+  line-height:30px;
+  vertical-align: middle;
 }
 
 .break-line {

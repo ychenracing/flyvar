@@ -40,6 +40,7 @@ public class QueryDao {
     private static final String FLYBASE_ID_TABLE          = "cg_id_convert";
     private static final String GENENAME_TABLE            = "dmel_all_r5_12_refgene";
     private static final String GENENAME_FLYBASE_ID_TABLE = "fbgn_fbtr";
+    private static final String DISPENSABLE_GENE_TABLE    = "fbgn_fbtr";
 
     @Autowired
     @Qualifier("jdbcTemplate")
@@ -58,6 +59,15 @@ public class QueryDao {
         ImmutablePair<String, String> compatibleChr = variation.getCompatibleChrPair();
         List<?> result = flyvarJdbcTemplate.queryForList(sql, compatibleChr.left,
             compatibleChr.right, variation.getPos(), variation.getRef(), variation.getAlt());
+        return !CollectionUtils.isEmpty(result);
+    }
+
+    public boolean existsInDispensableGene(Variation variation) {
+        String sql = "select chr from " + DISPENSABLE_GENE_TABLE
+                     + " where (chr=? or chr=?) and ? between start and end limit 1";
+        ImmutablePair<String, String> compatibleChr = variation.getCompatibleChrPair();
+        List<?> result = flyvarJdbcTemplate.queryForList(sql, compatibleChr.left,
+            compatibleChr.right, variation.getPos());
         return !CollectionUtils.isEmpty(result);
     }
 

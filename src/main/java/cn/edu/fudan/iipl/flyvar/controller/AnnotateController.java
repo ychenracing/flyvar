@@ -8,6 +8,7 @@ import java.net.URLConnection;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -104,7 +105,7 @@ public class AnnotateController extends AbstractController {
         String mimeType = URLConnection.guessContentTypeFromName(filePath.getFileName().toString());
         if (mimeType == null) {
             mimeType = "application/octet-stream";
-            logger.info("mimetype is not detectable, will take default. mimeType={}", mimeType);
+            // logger.info("mimetype is not detectable, will take default. mimeType={}", mimeType);
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(mimeType));
@@ -150,13 +151,16 @@ public class AnnotateController extends AbstractController {
             }
             vcfFilePath = annotateService.convertVariationsToVcfFile(variations);
         } else { // vcf format
-            if (annotateFile != null) {
+            // no matter you submitted file or not, annotateFile never be null.
+            if (StringUtils.isBlank(annotateForm.getAnnotateInput())) {
                 vcfFilePath = FlyvarFileUtils.saveUploadFileAndGetFilePath(annotateFile,
                     pathUtils.getAbsoluteAnnotationFilesPath().toString());
             } else {
                 String variationVcfStr = annotateForm.getAnnotateInput();
                 List<String> vcfLines = Lists
                     .newArrayList(variationVcfStr.replaceAll("\r", "").split("\n"));
+                vcfLines = vcfLines.stream().map(line -> line.replaceAll("\\s+", "\t"))
+                    .collect(Collectors.toList());
                 vcfFilePath = pathUtils.getAbsoluteAnnotationFilesPath()
                     .resolve(FlyvarFileUtils.getGeneratedFileName("Annotate_uploaded_", ".vcf"));
                 FlyvarFileUtils.writeLinesToPath(vcfLines, vcfFilePath.toString());

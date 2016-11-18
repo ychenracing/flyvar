@@ -52,7 +52,7 @@ public enum VariationDataBaseType {
     }
 
     public static VariationDataBaseType of(int code) {
-        for (VariationDataBaseType item : VariationDataBaseType.values()) {
+        for (VariationDataBaseType item : values()) {
             if (item.getCode() == code) {
                 return item;
             }

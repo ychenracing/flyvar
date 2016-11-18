@@ -4,6 +4,7 @@
 package cn.edu.fudan.iipl.flyvar.model;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -139,6 +140,27 @@ public class Variation implements Comparable<Variation>, Serializable {
             Variation variation = new Variation(chr, Long.parseLong(pos), ref, alt);
             result.add(variation);
         }
+        return result;
+    }
+
+    public static Set<Variation> convertVcfInputToVariations(String variationStr) {
+        String[] vcfLines = variationStr.replace("\r", "").split("\n");
+        Set<Variation> result = Sets.newLinkedHashSet();
+        Arrays.stream(vcfLines).forEach(vcfLine -> {
+            String[] varSplitted = vcfLine.split("\\s+");
+            for (int i = 0; i < varSplitted.length; i++) {
+                String chr = varSplitted[i++];
+                String pos = varSplitted[i++];
+                i++;
+                String ref = varSplitted[i++];
+                String alt = varSplitted[i];
+                if (!pos.matches("[0-9]+") || !ref.matches("[ATCG]+") || !alt.matches("[ATCG]+")) {
+                    return;
+                }
+                Variation variation = new Variation(chr, Long.parseLong(pos), ref, alt);
+                result.add(variation);
+            }
+        });
         return result;
     }
 

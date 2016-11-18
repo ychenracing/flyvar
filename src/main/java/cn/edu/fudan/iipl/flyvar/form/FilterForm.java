@@ -54,7 +54,7 @@ public class FilterForm implements Serializable {
         return removeDispensable;
     }
 
-    public void setRemoveDispensible(Integer removeDispensable) {
+    public void setRemoveDispensable(Integer removeDispensable) {
         this.removeDispensable = removeDispensable;
     }
 
