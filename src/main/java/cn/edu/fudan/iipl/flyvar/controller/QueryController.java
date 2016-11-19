@@ -49,7 +49,7 @@ import cn.edu.fudan.iipl.flyvar.service.CacheService;
 import cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService;
 import cn.edu.fudan.iipl.flyvar.service.QueryService;
 import cn.edu.fudan.iipl.flyvar.service.SampleNameService;
-import cn.edu.fudan.iipl.flyvar.service.impl.SampleLinkVO;
+import cn.edu.fudan.iipl.flyvar.vo.SampleLinkVO;
 
 /**
  * variantion query控制器

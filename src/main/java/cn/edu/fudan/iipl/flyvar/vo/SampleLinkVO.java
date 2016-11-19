@@ -1,7 +1,7 @@
 /**
  * ychen. Copyright (c) 2016年11月19日.
  */
-package cn.edu.fudan.iipl.flyvar.service.impl;
+package cn.edu.fudan.iipl.flyvar.vo;
 
 import java.io.Serializable;
 
