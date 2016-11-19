@@ -21,21 +21,21 @@
 			</div>
 		</div>
 		<div class="row mtd5p">
-			<div class="span12 text-justify pd90">Welcome to the fly variation
-				database(FlyVar) website. FlyVar is a free integrative platform that
-				addresses the increasing need of next generation sequencing data
-				analysis in the Drosophila research community. It is composed of
-				three parts. First, a database that contains 5.94 million DNA
-				polymorphisms found in Drosophila melanogaster derived from whole
-				genome shotgun sequencing of 561 genomes of D. melanogaster. It
-				shows an average of one variant per 20 bases across the genome.
-				Second, a GUI interface has been implemented to allow easy and
-				flexible query of the database. Third, a set of interactive online
-				tools enables filtering and annotation of genomic sequence obtained
-				from individual D. melanogaster strains to identify candidate
-				mutations. FlyVar permits the analysis of next generation sequencing
-				data without the need of extensive computational training or
-				resources.</div>
+			<div class="span12 text-justify pd90">Welcome to the fly
+				variation database(FlyVar) website. FlyVar is a free integrative
+				platform that addresses the increasing need of next generation
+				sequencing data analysis in the Drosophila research community. It is
+				composed of three parts. First, a database that contains 5.94
+				million DNA polymorphisms found in Drosophila melanogaster derived
+				from whole genome shotgun sequencing of 561 genomes of D.
+				melanogaster. It shows an average of one variant per 20 bases across
+				the genome. Second, a GUI interface has been implemented to allow
+				easy and flexible query of the database. Third, a set of interactive
+				online tools enables filtering and annotation of genomic sequence
+				obtained from individual D. melanogaster strains to identify
+				candidate mutations. FlyVar permits the analysis of next generation
+				sequencing data without the need of extensive computational training
+				or resources.</div>
 		</div>
 		<div class="row mtd10p">
 			<div class="span12 pd90">
@@ -45,8 +45,9 @@
 						alt="click to visit this function"
 						style="width: 140px; height: 140px;"></a>
 					<h3>variation query</h3>
-					<p class="text-justify">Information of variants in the database could be
-						flexibly queried.</p>
+					<p class="text-justify">Information of variants in the database
+						could be flexibly queried based on fly strain ID, genomic
+						coordinate, a given genomic interval, and gene ID.</p>
 				</div>
 				<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center">
 					<a href="annotate.htm"><img id="img_annotate"
@@ -54,8 +55,8 @@
 						alt="click to visit this function"
 						style="width: 140px; height: 140px;"></a>
 					<h3>variation annotate</h3>
-					<p class="text-justify">This tool is a user friendly interface to
-						annotate variants at batch model. You will know thousands of
+					<p class="text-justify">This tool is a user friendly interface
+						to annotate variants at batch model. You will know thousands of
 						variants' function all at once.</p>
 				</div>
 				<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center">
@@ -64,9 +65,9 @@
 						alt="click to visit this function"
 						style="width: 140px; height: 140px;"></a>
 					<h3>variation filter</h3>
-					<p class="text-justify">This function will remove common variants. It
-						will greatly reduce lab work to identify the potential phenotype
-						relevant mutation.</p>
+					<p class="text-justify">This function will remove common
+						variants. It will greatly reduce lab work to identify the
+						potential phenotype relevant mutation.</p>
 				</div>
 			</div>
 		</div>

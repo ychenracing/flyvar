@@ -51,4 +51,13 @@ public interface AnnotateService {
      */
     public Path convertVariationsToVcfFile(Collection<Variation> variations);
 
+    /**
+     * merge whole region annotation file and exon annotation file.
+     * 
+     * @param annovarInputFileName
+     *            annovar input file name, it must be put in annovar's annotationPath folder.
+     * @return
+     */
+    public Path mergeAnnotateResult(String annovarInputFileName);
+
 }

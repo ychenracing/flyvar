@@ -3,8 +3,8 @@
 </div>
 <div class="row">
 	<div class="span12 text-center">
-		<a href="./contactus.jsp">Contact information</a>&nbsp;|&nbsp;<a
-			href="./register.jsp">Register</a>&nbsp;|&nbsp;<a href="./login.jsp">Log
+		<a href="contact.htm">Contact information</a>&nbsp;|&nbsp;<a
+			href="register.htm">Register</a>&nbsp;|&nbsp;<a href="login.htm">Log
 			in</a>
 	</div>
 </div>

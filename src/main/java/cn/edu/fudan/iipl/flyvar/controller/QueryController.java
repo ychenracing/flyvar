@@ -7,11 +7,13 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -33,6 +36,7 @@ import cn.edu.fudan.iipl.flyvar.common.AnnovarUtils;
 import cn.edu.fudan.iipl.flyvar.common.FlyvarFileUtils;
 import cn.edu.fudan.iipl.flyvar.common.PathUtils;
 import cn.edu.fudan.iipl.flyvar.exception.FlyvarSystemException;
+import cn.edu.fudan.iipl.flyvar.exception.InvalidAccessException;
 import cn.edu.fudan.iipl.flyvar.form.QueryForm;
 import cn.edu.fudan.iipl.flyvar.model.QueryResultVariation;
 import cn.edu.fudan.iipl.flyvar.model.Variation;
@@ -45,6 +49,7 @@ import cn.edu.fudan.iipl.flyvar.service.CacheService;
 import cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService;
 import cn.edu.fudan.iipl.flyvar.service.QueryService;
 import cn.edu.fudan.iipl.flyvar.service.SampleNameService;
+import cn.edu.fudan.iipl.flyvar.service.impl.SampleLinkVO;
 
 /**
  * variantion query控制器
@@ -63,6 +68,10 @@ public class QueryController extends AbstractController {
     private static final String     QUERY_RESULT_JSP           = "query/result";
 
     private static final String     QUERY_BY_SAMPLE_RESULT_JSP = "query/sendEmailSuccess";
+
+    private static final String     SAMPLE_LIST_JSP            = "query/sampleList";
+
+    private static final String     NOT_FOUNT_JSP              = "error/404";
 
     @Autowired
     private PathUtils               pathUtils;
@@ -181,7 +190,7 @@ public class QueryController extends AbstractController {
     public String showQueryResults(HttpServletRequest request, Model model) {
         checkReferer(request);
         if (!model.containsAttribute("queryResult")) {
-            throw new RuntimeException("Invalid access!");
+            throw new InvalidAccessException("Invalid access!");
         }
         return QUERY_RESULT_JSP;
     }
@@ -196,9 +205,18 @@ public class QueryController extends AbstractController {
     }
 
     @RequestMapping(value = { "/query/sample/list.htm" }, method = { RequestMethod.GET })
-    private String variationSampleList() {
-        // TODO: sample list for a variation
-        return null;
+    private String variationSampleList(HttpServletRequest request, @RequestParam String chr,
+                                       @RequestParam Long pos, @RequestParam String ref,
+                                       @RequestParam String alt, Model model) {
+        if (!ref.matches("[ATCG]+") || !alt.matches("[ATCG]+"))
+            return NOT_FOUNT_JSP;
+        Variation variation = new Variation(chr, pos, ref, alt);
+        List<Pair<String, String>> linkPairs = sampleNameService
+            .getSampleLinkPair(sampleNameService.getSampleNames(variation));
+        List<SampleLinkVO> sampleLinks = linkPairs.stream()
+            .map(pair -> SampleLinkVO.convertToSampleLinkVO(pair)).collect(Collectors.toList());
+        model.addAttribute("sampleListResult", sampleLinks);
+        return SAMPLE_LIST_JSP;
     }
 
     private boolean validateQueryParams(HttpServletRequest request, @Valid QueryForm queryForm,
@@ -314,8 +332,11 @@ public class QueryController extends AbstractController {
         redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
         redirectModel.addFlashAttribute("annotateResult",
             annotateResultPath.getFileName().toString());
-        redirectModel.addFlashAttribute("exonicAnnotate",
-            exonicAnnotatePath.getFileName().toString());
+        if (exonicAnnotatePath.toFile().length() > 0) {
+            redirectModel.addFlashAttribute("combinedExonicResult",
+                annotateService.mergeAnnotateResult(annovarInputPath.getFileName().toString())
+                    .getFileName().toString());
+        }
         redirectModel.addFlashAttribute("combineAnnovarOut",
             combineAnnovarOutPath.getFileName().toString());
         if (annovarInvalidInputPath.toFile().exists()) {
@@ -376,8 +397,11 @@ public class QueryController extends AbstractController {
         redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
         redirectModel.addFlashAttribute("annotateResult",
             annotateResultPath.getFileName().toString());
-        redirectModel.addFlashAttribute("exonicAnnotate",
-            exonicAnnotatePath.getFileName().toString());
+        if (exonicAnnotatePath.toFile().length() > 0) {
+            redirectModel.addFlashAttribute("combinedExonicResult",
+                annotateService.mergeAnnotateResult(annovarInputPath.getFileName().toString())
+                    .getFileName().toString());
+        }
         redirectModel.addFlashAttribute("combineAnnovarOut",
             combineAnnovarOutPath.getFileName().toString());
         if (annovarInvalidInputPath.toFile().exists()) {
@@ -416,6 +440,7 @@ public class QueryController extends AbstractController {
         }
         List<QueryResultVariation> queryResult = queryService.queryByRegion(regions,
             VariationDataBaseType.of(queryForm.getVariationDb()));
+
         redirectModel.addFlashAttribute("queryResult", queryResult);
         redirectModel.addFlashAttribute("queryType", queryForm.getVariationDb());
         return true;
@@ -465,8 +490,11 @@ public class QueryController extends AbstractController {
         redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
         redirectModel.addFlashAttribute("annotateResult",
             annotateResultPath.getFileName().toString());
-        redirectModel.addFlashAttribute("exonicAnnotate",
-            exonicAnnotatePath.getFileName().toString());
+        if (exonicAnnotatePath.toFile().length() > 0) {
+            redirectModel.addFlashAttribute("combinedExonicResult",
+                annotateService.mergeAnnotateResult(annovarInputPath.getFileName().toString())
+                    .getFileName().toString());
+        }
         redirectModel.addFlashAttribute("combineAnnovarOut",
             combineAnnovarOutPath.getFileName().toString());
         if (annovarInvalidInputPath.toFile().exists()) {
@@ -555,8 +583,11 @@ public class QueryController extends AbstractController {
         redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
         redirectModel.addFlashAttribute("annotateResult",
             annotateResultPath.getFileName().toString());
-        redirectModel.addFlashAttribute("exonicAnnotate",
-            exonicAnnotatePath.getFileName().toString());
+        if (exonicAnnotatePath.toFile().length() > 0) {
+            redirectModel.addFlashAttribute("combinedExonicResult",
+                annotateService.mergeAnnotateResult(annovarInputPath.getFileName().toString())
+                    .getFileName().toString());
+        }
         redirectModel.addFlashAttribute("combineAnnovarOut",
             combineAnnovarOutPath.getFileName().toString());
         if (annovarInvalidInputPath.toFile().exists()) {
@@ -644,8 +675,11 @@ public class QueryController extends AbstractController {
         redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
         redirectModel.addFlashAttribute("annotateResult",
             annotateResultPath.getFileName().toString());
-        redirectModel.addFlashAttribute("exonicAnnotate",
-            exonicAnnotatePath.getFileName().toString());
+        if (exonicAnnotatePath.toFile().length() > 0) {
+            redirectModel.addFlashAttribute("combinedExonicResult",
+                annotateService.mergeAnnotateResult(annovarInputPath.getFileName().toString())
+                    .getFileName().toString());
+        }
         redirectModel.addFlashAttribute("combineAnnovarOut",
             combineAnnovarOutPath.getFileName().toString());
         if (annovarInvalidInputPath.toFile().exists()) {

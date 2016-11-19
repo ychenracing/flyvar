@@ -30,22 +30,22 @@
 										href="annotate/result/${annovarInput}">annovar input</a></td>
 								</tr>
 							</c:if>
+
 							<c:if test="${annotateResult != null}">
 								<tr>
 									<td class="text-justify text-nowrap">variant function:</td>
-									<td class="text-justify text-nowrap"><a
-										href="annotate/result/${annotateResult}">variant function</a></td>
+									<c:if test="${combinedExonicResult != null}">
+										<td class="text-justify text-nowrap"><a
+											href="annotate/result/${combinedExonicResult}">variant
+												function</a></td>
+									</c:if>
+									<c:if test="${combinedExonicResult == null}">
+										<td class="text-justify text-nowrap"><a
+											href="annotate/result/${annotateResult}">variant function</a></td>
+									</c:if>
 								</tr>
 							</c:if>
-							<c:if test="${exonicAnnotate != null}">
-								<tr>
-									<td class="text-justify text-nowrap">exonic variant
-										function:</td>
-									<td class="text-justify text-nowrap"><a
-										href="annotate/result/${exonicAnnotate}">exonic variant
-											function</a></td>
-								</tr>
-							</c:if>
+
 							<c:if test="${combineAnnovarOut != null}">
 								<tr>
 									<td class="text-justify text-nowrap">combined annovar

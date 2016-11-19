@@ -69,10 +69,10 @@
 						type</div>
 					<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right">
 						<label class="radio"> <form:radiobutton id="four_column"
-								path="inputFormatType" value="1" checked="checked" /> 4 column
+								path="inputFormatType" value="1" checked="checked" onclick="filterByFourColumn()" /> 4 column
 							tab separated format
 						</label> <label class="radio"> <form:radiobutton id="vcf_format"
-								path="inputFormatType" value="2" /> vcf format
+								path="inputFormatType" value="2" onclick="filterByVcf()" /> vcf format
 						</label>
 						<form:errors path="inputFormatType" cssClass="error" />
 					</div>

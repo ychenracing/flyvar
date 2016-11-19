@@ -32,16 +32,30 @@
 							</tr>
 						</thead>
 						<tbody>
-							<c:forEach var="variationItem" items="${queryResults}" varStatus="itemInfo">
+							<c:forEach var="variationItem" items="${queryResult}"
+								varStatus="itemInfo">
 								<tr>
-									<td class="text-justify text-nowrap"><c:out value="${itemInfo.index+1}" /></td>
-									<td class="text-justify text-nowrap"><c:out value="${variationItem.getChr()}" /></td>
-									<td class="text-justify text-nowrap"><c:out value="${variationItem.getPos()}" /></td>
-									<td class="text-justify break-line"><c:out value="${variationItem.getRef()}" /></td>
-									<td class="text-justify break-line"><c:out value="${variationItem.getAlt()}" /></td>
+									<td class="text-justify text-nowrap"><c:out
+											value="${itemInfo.index+1}" /></td>
+									<td class="text-justify text-nowrap"><c:out
+											value="${variationItem.getChr()}" /></td>
+									<td class="text-justify text-nowrap"><c:out
+											value="${variationItem.getPos()}" /></td>
+									<td class="text-justify break-line"><c:out
+											value="${variationItem.getRef()}" /></td>
+									<td class="text-justify break-line"><c:out
+											value="${variationItem.getAlt()}" /></td>
 									<c:if
 										test="${queryType != null && (queryType == 1 || queryType == 2)}">
-										<td class="text-justify text-nowrap"><c:out value="${variationItem.getCount()}" /></td>
+										<td class="text-justify text-nowrap"><c:url
+												var="flybaseLink" value="query/sample/list.htm">
+												<c:param name="chr" value="${variationItem.getChr()}" />
+												<c:param name="pos" value="${variationItem.getPos()}" />
+												<c:param name="ref" value="${variationItem.getRef()}" />
+												<c:param name="alt" value="${variationItem.getAlt()}" />
+											</c:url> <a href="${flybaseLink}"> <c:out
+													value="${variationItem.getCount()}" />
+										</a></td>
 									</c:if>
 								</tr>
 							</c:forEach>

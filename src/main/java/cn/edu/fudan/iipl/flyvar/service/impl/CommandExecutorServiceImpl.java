@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,36 +23,54 @@ public class CommandExecutorServiceImpl implements CommandExecutorService {
     private static final Logger    logger = LoggerFactory
         .getLogger(CommandExecutorServiceImpl.class);
 
+    // private static final String ERROR_OUTPUT_PATTERN = "\\s2\\s?>\\s?\\S+";
+
+    // private static final String OUTPUT_PATTERN = "\\s1?\\s?>\\s?(\\S+)";
+
+    // private static final Pattern outputPattern = Pattern.compile(OUTPUT_PATTERN);
+
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
 
     @Override
     public void execute(String command) {
+        if (StringUtils.isBlank(command)) {
+            logger.error("Command is blank, will not be executed!, cmd=" + command);
+            return;
+        }
         List<String> commands = Lists.newArrayList();
         try {
             if (!isWindows()) {
-                commands.addAll(Arrays.asList("/bin/bash", "-cl")); // use bash on non-windows machines
+                commands.addAll(Arrays.asList("/bin/bash", "-cl")); // use bash on non-windows
             } else {
                 commands.addAll(Arrays.asList("cmd", "/c")); // use cmd on windows machine
             }
-            commands.addAll(Arrays.asList(command.split("\\s+")));
-            ProcessBuilder processBuilder = new ProcessBuilder(commands);
-            Process process = processBuilder.start();
 
-            try (InputStream is = process.getInputStream();
-                    InputStreamReader isr = new InputStreamReader(is);
-                    BufferedReader br = new BufferedReader(isr)) {
-                while ((br.readLine()) != null) {
-                    // remove output information, to prevent output info blocking the pipe, which may lead to pause the command executing.
-                }
-            }
-            try (InputStream is = process.getErrorStream();
-                    InputStreamReader isr = new InputStreamReader(is);
-                    BufferedReader br = new BufferedReader(isr)) {
-                while ((br.readLine()) != null) {
-                    // remove err information, to prevent err info blocking the pipe, which may lead to pause the command executing.
-                }
-            }
+            // Path outputFilepath = null;
+            // if (command.contains(">")) {
+            // command = command.replaceAll(ERROR_OUTPUT_PATTERN, "");
+            // Matcher outputMatcher = outputPattern.matcher(command);
+            // if (outputMatcher.find()) {
+            // outputFilepath = Paths.get(outputMatcher.group(1));
+            // }
+            // command = command.replaceAll(OUTPUT_PATTERN, "");
+            // }
+            // Collections.addAll(commands, command.split("\\s+"));
+            //
+            // ProcessBuilder processBuilder = new ProcessBuilder(commands);
+            // if (outputFilepath != null) {
+            // processBuilder.redirectOutput(outputFilepath.toFile());
+            // }
+            // Process process = processBuilder.start();
+            //
+            // if (outputFilepath == null) {
+            // taskExecutor.execute(removeInfoInStream(process.getInputStream()));
+            // }
+
+            commands.add(command);
+            Process process = Runtime.getRuntime().exec(commands.toArray(new String[0]));
+            taskExecutor.execute(removeInfoInStream(process.getInputStream()));
+            taskExecutor.execute(removeInfoInStream(process.getErrorStream()));
 
             if (process.waitFor() != 0) {
                 logger.error("Command executed failed!, cmd=" + command);
@@ -59,6 +78,21 @@ public class CommandExecutorServiceImpl implements CommandExecutorService {
         } catch (Exception ex) {
             logger.error("Command executed failed!, cmd=" + command, ex);
         }
+        logger.info("command execute finished! command={}", command);
+    }
+
+    private Runnable removeInfoInStream(InputStream is) {
+        return () -> {
+            try (InputStreamReader isr = new InputStreamReader(is);
+                    BufferedReader br = new BufferedReader(isr)) {
+                // remove information, to prevent output info blocking the pipe, which may lead to
+                // pause the command executing.
+                while (br.readLine() != null) {
+                }
+            } catch (Exception e) {
+                logger.error("error reading stream information when command is executing!", e);
+            }
+        };
     }
 
     @Override

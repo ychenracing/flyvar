@@ -109,4 +109,36 @@ public class AnnotateServiceImpl implements AnnotateService {
         return vcfFilePath;
     }
 
+    /**
+     * @see cn.edu.fudan.iipl.flyvar.service.AnnotateService#mergeAnnotateResult(java.nio.file.Path)
+     */
+    @Override
+    public Path mergeAnnotateResult(String annovarInputFileName) {
+        Path combinedOutputPath = null;
+        try {
+            List<String> combineScriptLines = Lists.newArrayList();
+            combineScriptLines
+                .addAll(annovarUtils.getRscriptHeadersForCombiningAnnotate(annovarInputFileName));
+
+            combineScriptLines.addAll(FileUtils.readLines(
+                pathUtils.getAbsoluteAnnotationFilesPath().resolve("excuteR.R").toFile(), "utf-8"));
+            combinedOutputPath = pathUtils.getAbsoluteAnnotationFilesPath()
+                .resolve(FlyvarFileUtils.getGeneratedFileName("combined_annotate_", ".variant_function"));
+            combineScriptLines.add(annovarUtils
+                .getRscriptBottomForCombiningAnnotate(combinedOutputPath.getFileName().toString()));
+            Path rScriptPath = pathUtils.getAbsoluteAnnotationFilesPath()
+                .resolve(FlyvarFileUtils.getGeneratedFileName("generated_r_", ".r"));
+            FileUtils.writeLines(rScriptPath.toFile(), combineScriptLines);
+            Path rScriptOutputPath = pathUtils.getAbsoluteAnnotationFilesPath()
+                .resolve(FlyvarFileUtils.getGeneratedFileName("generated_r_output_", ".txt"));
+
+            String combineRunningCommand = annovarUtils.getRScriptCombineRunningCommand(
+                rScriptPath.getFileName().toString(), rScriptOutputPath.getFileName().toString());
+            commandExecutorService.execute(combineRunningCommand);
+        } catch (Exception ex) {
+            logger.error("combine annotate result error!", ex);
+        }
+        return combinedOutputPath;
+    }
+
 }

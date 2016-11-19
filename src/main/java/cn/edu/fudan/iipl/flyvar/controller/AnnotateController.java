@@ -39,7 +39,7 @@ import cn.edu.fudan.iipl.flyvar.AbstractController;
 import cn.edu.fudan.iipl.flyvar.common.AnnovarUtils;
 import cn.edu.fudan.iipl.flyvar.common.FlyvarFileUtils;
 import cn.edu.fudan.iipl.flyvar.common.PathUtils;
-import cn.edu.fudan.iipl.flyvar.exception.FlyvarSystemException;
+import cn.edu.fudan.iipl.flyvar.exception.InvalidAccessException;
 import cn.edu.fudan.iipl.flyvar.exception.NotFoundException;
 import cn.edu.fudan.iipl.flyvar.form.AnnotateForm;
 import cn.edu.fudan.iipl.flyvar.model.Variation;
@@ -81,9 +81,8 @@ public class AnnotateController extends AbstractController {
     public String annotateResult(HttpServletRequest request, Model model) {
         checkReferer(request);
         if (!model.containsAttribute("annovarInput") || !model.containsAttribute("annotateResult")
-            || !model.containsAttribute("exonicAnnotate")
             || !model.containsAttribute("combineAnnovarOut")) {
-            throw new FlyvarSystemException("Invalid access!");
+            throw new InvalidAccessException("Invalid access!");
         }
         return ANNOTATE_RESULT_JSP;
     }
@@ -150,7 +149,7 @@ public class AnnotateController extends AbstractController {
                 return ANNOTATE_JSP;
             }
             vcfFilePath = annotateService.convertVariationsToVcfFile(variations);
-        } else { // vcf format
+        } else if (inputFormat == AnnotateInputType.VCF_FORMAT) { // vcf format
             // no matter you submitted file or not, annotateFile never be null.
             if (StringUtils.isBlank(annotateForm.getAnnotateInput())) {
                 vcfFilePath = FlyvarFileUtils.saveUploadFileAndGetFilePath(annotateFile,
@@ -162,11 +161,13 @@ public class AnnotateController extends AbstractController {
                 vcfLines = vcfLines.stream().map(line -> line.replaceAll("\\s+", "\t"))
                     .collect(Collectors.toList());
                 vcfFilePath = pathUtils.getAbsoluteAnnotationFilesPath()
-                    .resolve(FlyvarFileUtils.getGeneratedFileName("Annotate_uploaded_", ".vcf"));
+                    .resolve(FlyvarFileUtils.getGeneratedFileName("annotate_generated_", ".vcf"));
                 FlyvarFileUtils.writeLinesToPath(vcfLines, vcfFilePath.toString());
+                logger.info("saved vcf lines to file! vcfFilePath={}", vcfFilePath);
             }
         }
         annotateService.annotateVcfFormatVariation(vcfFilePath);
+        logger.info("annotate vcf file finished! vcfFilePath={}", vcfFilePath);
         Path annovarInputPath = annovarUtils
             .getAnnovarInputPath(vcfFilePath.getFileName().toString());
         Path annotateResultPath = annovarUtils
@@ -181,8 +182,11 @@ public class AnnotateController extends AbstractController {
         redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
         redirectModel.addFlashAttribute("annotateResult",
             annotateResultPath.getFileName().toString());
-        redirectModel.addFlashAttribute("exonicAnnotate",
-            exonicAnnotatePath.getFileName().toString());
+        if (exonicAnnotatePath.toFile().length() > 0) {
+            redirectModel.addFlashAttribute("combinedExonicResult",
+                annotateService.mergeAnnotateResult(vcfFilePath.getFileName().toString())
+                    .getFileName().toString());
+        }
         redirectModel.addFlashAttribute("combineAnnovarOut",
             combineAnnovarOutPath.getFileName().toString());
         if (annovarInvalidInputPath.toFile().exists()) {

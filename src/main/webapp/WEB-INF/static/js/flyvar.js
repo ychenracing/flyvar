@@ -18,12 +18,16 @@ function activeNavigation() {
 	var indexReg = /flyvar\/*$/g;
 	if (indexReg.test(curUrl) || curUrl.endsWith("index.htm")) {
 		$("#navi_home").attr("class", "active");
-	} else if (curUrl.endsWith("query.htm") || curUrl.endsWith("queryResult.htm")) {
+	} else if (curUrl.endsWith("flyvar/query.htm") || curUrl.endsWith("flyvar/query/result.htm")) {
 		$("#navi_query").attr("class", "active");
-	} else if (curUrl.endsWith("annotate.htm")) {
+	} else if (curUrl.endsWith("flyvar/annotate.htm") || curUrl.endsWith("flyvar/annotate/result.htm")) {
 		$("#navi_annotate").attr("class", "active");
-	} else if (curUrl.endsWith("filter.htm")) {
+	} else if (curUrl.endsWith("flyvar/filter.htm") || curUrl.endsWith("flyvar/annotate/result.htm")) {
 		$("#navi_filter").attr("class", "active");
+	} else if (curUrl.endsWith("flyvar/dispensableGene.htm")) {
+		$("#navi_dispensableGene").attr("class", "active");
+	} else if (curUrl.endsWith("flyvar/sourceForDownloading.htm")) {
+		$("#navi_sourceForDownloading").attr("class", "active");
 	}
 }
 

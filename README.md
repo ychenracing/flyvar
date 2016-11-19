@@ -10,7 +10,7 @@ FlyVar permits the analysis of next generation sequencing data without the need 
 
 ## Reference##
 
-\[1\] [Wang F, Jiang L, Chen Y, et al. FlyVar: a database for genetic variation in Drosophila melanogaster[J]. Database, 2015, 2015: bav079.](http://database.oxfordjournals.org/content/2015/bav079.long)
+\[1\] [Wang F, Jiang L, Chen Y, et al. FlyVar: a database for genetic variation in Drosophila melanogaster[J]. Database, 2015, 2015: bav079.](https://academic.oup.com/database/article/2433212/FlyVar-a-database-for-genetic-variation-in)
 
 ## Requirements
 

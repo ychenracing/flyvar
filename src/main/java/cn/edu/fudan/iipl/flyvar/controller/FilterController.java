@@ -27,6 +27,7 @@ import cn.edu.fudan.iipl.flyvar.AbstractController;
 import cn.edu.fudan.iipl.flyvar.common.AnnovarUtils;
 import cn.edu.fudan.iipl.flyvar.common.FlyvarFileUtils;
 import cn.edu.fudan.iipl.flyvar.common.PathUtils;
+import cn.edu.fudan.iipl.flyvar.exception.InvalidAccessException;
 import cn.edu.fudan.iipl.flyvar.form.FilterForm;
 import cn.edu.fudan.iipl.flyvar.model.Variation;
 import cn.edu.fudan.iipl.flyvar.model.constants.FilterInputType;
@@ -168,8 +169,11 @@ public class FilterController extends AbstractController {
         redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
         redirectModel.addFlashAttribute("annotateResult",
             annotateResultPath.getFileName().toString());
-        redirectModel.addFlashAttribute("exonicAnnotate",
-            exonicAnnotatePath.getFileName().toString());
+        if (exonicAnnotatePath.toFile().length() > 0) {
+            redirectModel.addFlashAttribute("combinedExonicResult",
+                annotateService.mergeAnnotateResult(vcfFilePath.getFileName().toString())
+                    .getFileName().toString());
+        }
         redirectModel.addFlashAttribute("combineAnnovarOut",
             combineAnnovarOutPath.getFileName().toString());
         if (annovarInvalidInputPath.toFile().exists()) {
@@ -183,7 +187,7 @@ public class FilterController extends AbstractController {
     public String showFilterResult(HttpServletRequest request, Model model) {
         checkReferer(request);
         if (!model.containsAttribute("filterResult")) {
-            throw new RuntimeException("Invalid access!");
+            throw new InvalidAccessException("Invalid access!");
         }
         return FILTER_RESULT_JSP;
     }

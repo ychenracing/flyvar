@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 
 import cn.edu.fudan.iipl.flyvar.AbstractController;
 import cn.edu.fudan.iipl.flyvar.exception.FlyvarSystemException;
+import cn.edu.fudan.iipl.flyvar.exception.InvalidAccessException;
 import cn.edu.fudan.iipl.flyvar.exception.NotFoundException;
 import cn.edu.fudan.iipl.flyvar.model.constants.ErrorType;
 
@@ -35,12 +36,14 @@ import cn.edu.fudan.iipl.flyvar.model.constants.ErrorType;
 @ControllerAdvice
 public class FlyvarControllerAdvice extends AbstractController {
 
-    private static final Logger logger           = LoggerFactory
+    private static final Logger logger             = LoggerFactory
         .getLogger(FlyvarControllerAdvice.class);
 
-    private static final String SYSTEM_ERROR_JSP = "error/500";
+    private static final String SYSTEM_ERROR_JSP   = "error/500";
 
-    private static final String NOT_FOUND_JSP    = "error/404";
+    private static final String NOT_FOUND_JSP      = "error/404";
+
+    private static final String INVALID_ACCESS_JSP = "error/invalidAccess";
 
     @ExceptionHandler(value = { IllegalArgumentException.class })
     @ResponseStatus(value = HttpStatus.OK)
@@ -82,6 +85,15 @@ public class FlyvarControllerAdvice extends AbstractController {
                                            HttpServletResponse response) {
         logger.info(getClientIP(request) + " " + error.getMessage());
         return NOT_FOUND_JSP;
+    }
+
+    @ExceptionHandler(value = { InvalidAccessException.class })
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public String processInvalidAccessException(InvalidAccessException error,
+                                                HttpServletRequest request,
+                                                HttpServletResponse response) {
+        logger.info(getClientIP(request) + " " + error.getMessage());
+        return INVALID_ACCESS_JSP;
     }
 
     @ExceptionHandler(value = { Exception.class })

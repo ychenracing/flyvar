@@ -1,5 +1,6 @@
 package cn.edu.fudan.iipl.flyvar.common;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -82,8 +83,99 @@ public class AnnovarUtils {
     @Value("${annovar.invalidInputSuffix}")
     private String              invalidInputSuffix;
 
+    @Value("${combine.header.exonAnnovateResultPlaceholder}")
+    private String              combineHeaderExonAnnovateResultPlaceholder;
+    @Value("${combine.header.exonAnnovateResult}")
+    private String              combineHeaderExonAnnovateResult;
+    @Value("${combine.header.annovateResultPlaceholder}")
+    private String              combineHeaderAnnovateResultPlaceholder;
+    @Value("${combine.header.annovateResult}")
+    private String              combineHeaderAnnovateResult;
+    @Value("${combine.bottom.combinedOutputPlaceholder}")
+    private String              combineBottomCombinedOutputPlaceholder;
+    @Value("${combine.bottom}")
+    private String              combineBottom;
+    @Value("${combine.r.command.rScriptPathPlaceholder}")
+    private String              combineRCommandRScriptPathPlaceholder;
+    @Value("${combine.r.command.rScriptOutputPlaceholder}")
+    private String              combineRCommandRScriptOutputPlaceholder;
+    @Value("${combine.r.command}")
+    private String              combineRCommand;
+
     @Autowired
     private PathUtils           pathUtils;
+
+    public String getCombineHeaderExonAnnovateResultPlaceholder() {
+        return combineHeaderExonAnnovateResultPlaceholder;
+    }
+
+    public void setCombineHeaderExonAnnovateResultPlaceholder(String combineHeaderExonAnnovateResultPlaceholder) {
+        this.combineHeaderExonAnnovateResultPlaceholder = combineHeaderExonAnnovateResultPlaceholder;
+    }
+
+    public String getCombineHeaderExonAnnovateResult() {
+        return combineHeaderExonAnnovateResult;
+    }
+
+    public void setCombineHeaderExonAnnovateResult(String combineHeaderExonAnnovateResult) {
+        this.combineHeaderExonAnnovateResult = combineHeaderExonAnnovateResult;
+    }
+
+    public String getCombineHeaderAnnovateResultPlaceholder() {
+        return combineHeaderAnnovateResultPlaceholder;
+    }
+
+    public void setCombineHeaderAnnovateResultPlaceholder(String combineHeaderAnnovateResultPlaceholder) {
+        this.combineHeaderAnnovateResultPlaceholder = combineHeaderAnnovateResultPlaceholder;
+    }
+
+    public String getCombineHeaderAnnovateResult() {
+        return combineHeaderAnnovateResult;
+    }
+
+    public void setCombineHeaderAnnovateResult(String combineHeaderAnnovateResult) {
+        this.combineHeaderAnnovateResult = combineHeaderAnnovateResult;
+    }
+
+    public String getCombineBottomCombinedOutputPlaceholder() {
+        return combineBottomCombinedOutputPlaceholder;
+    }
+
+    public void setCombineBottomCombinedOutputPlaceholder(String combineBottomCombinedOutputPlaceholder) {
+        this.combineBottomCombinedOutputPlaceholder = combineBottomCombinedOutputPlaceholder;
+    }
+
+    public String getCombineBottom() {
+        return combineBottom;
+    }
+
+    public void setCombineBottom(String combineBottom) {
+        this.combineBottom = combineBottom;
+    }
+
+    public String getCombineRCommandRScriptPathPlaceholder() {
+        return combineRCommandRScriptPathPlaceholder;
+    }
+
+    public void setCombineRCommandRScriptPathPlaceholder(String combineRCommandRScriptPathPlaceholder) {
+        this.combineRCommandRScriptPathPlaceholder = combineRCommandRScriptPathPlaceholder;
+    }
+
+    public String getCombineRCommandRScriptOutputPlaceholder() {
+        return combineRCommandRScriptOutputPlaceholder;
+    }
+
+    public void setCombineRCommandRScriptOutputPlaceholder(String combineRCommandRScriptOutputPlaceholder) {
+        this.combineRCommandRScriptOutputPlaceholder = combineRCommandRScriptOutputPlaceholder;
+    }
+
+    public String getCombineRCommand() {
+        return combineRCommand;
+    }
+
+    public void setCombineRCommand(String combineRCommand) {
+        this.combineRCommand = combineRCommand;
+    }
 
     /**
      * 获取annovar命令。 需要进行annovate的文件必须位于annotatePath目录下。
@@ -291,6 +383,66 @@ public class AnnovarUtils {
 
     public void setInvalidInputSuffix(String invalidInputSuffix) {
         this.invalidInputSuffix = invalidInputSuffix;
+    }
+
+    /**
+     * Get R script headers for combining annotate results. annovarInputFile must be put in the
+     * directory of annovar's annotationPath.
+     * 
+     * @param annovarInputFileName
+     * @return
+     */
+    public List<String> getRscriptHeadersForCombiningAnnotate(String annovarInputFileName) {
+        String header1 = getCombineHeaderExonAnnovateResult().replaceAll(
+            getCombineHeaderExonAnnovateResultPlaceholder(),
+            getExonicAnnotatePath(annovarInputFileName).toString());
+        String header2 = getCombineHeaderAnnovateResult().replaceAll(
+            getCombineHeaderAnnovateResultPlaceholder(),
+            getAnnotatePath(annovarInputFileName).toString());
+        return Lists.newArrayList(header1, header2);
+    }
+
+    /**
+     * Get R script bottoms for combining annotate results. combineOutputFile must be put in the
+     * directory of annovar's annotationPath.
+     * 
+     * @param combineOutputFileName
+     * @return
+     */
+    public String getRscriptBottomForCombiningAnnotate(String combineOutputFileName) {
+        if (!Files
+            .exists(pathUtils.getAbsoluteAnnotationFilesPath().resolve(combineOutputFileName))) {
+            logger.error(combineOutputFileName + " not exists in folder:"
+                         + pathUtils.getAbsoluteAnnotationFilesPath());
+        }
+        return getCombineBottom().replaceAll(getCombineBottomCombinedOutputPlaceholder(),
+            pathUtils.getAbsoluteAnnotationFilesPath().resolve(combineOutputFileName).toString());
+    }
+
+    /**
+     * Get R script running command for combining annotate results. rScriptFile and
+     * rScriptOutputFile must be put in the directory of annovar's annotationPath.
+     * 
+     * @param rScriptFileName
+     * @param rScriptOutputFileName
+     * @return
+     */
+    public String getRScriptCombineRunningCommand(String rScriptFileName,
+                                                  String rScriptOutputFileName) {
+        if (!Files.exists(pathUtils.getAbsoluteAnnotationFilesPath().resolve(rScriptFileName))) {
+            logger.error(rScriptFileName + " not exists in folder:"
+                         + pathUtils.getAbsoluteAnnotationFilesPath());
+        }
+        if (!Files
+            .exists(pathUtils.getAbsoluteAnnotationFilesPath().resolve(rScriptOutputFileName))) {
+            logger.error(rScriptOutputFileName + " not exists in folder:"
+                         + pathUtils.getAbsoluteAnnotationFilesPath());
+        }
+        return getCombineRCommand()
+            .replaceAll(getCombineRCommandRScriptPathPlaceholder(),
+                pathUtils.getAbsoluteAnnotationFilesPath().resolve(rScriptFileName).toString())
+            .replaceAll(getCombineRCommandRScriptOutputPlaceholder(), pathUtils
+                .getAbsoluteAnnotationFilesPath().resolve(rScriptOutputFileName).toString());
     }
 
 }

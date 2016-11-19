@@ -5,6 +5,12 @@ public class Constants {
     /** sample name列表缓存key */
     public static final String CACHE_SAMPLE_NAME_LIST                     = "CACHE_SAMPLE_NAME_LIST_";
 
+    /** sample link pair list缓存key */
+    public static final String CACHE_SAMPLE_LINK_PAIR_LIST                = "CACHE_SAMPLE_LINK_PAIR_LIST_";
+
+    /** sample name列表for variation缓存key */
+    public static final String CACHE_SAMPLE_NAME_LIST_FOR_VARIATION       = "CACHE_SAMPLE_NAME_LIST_FOR_VARIATION_";
+
     /** sample name Set缓存key */
     public static final String CACHE_SAMPLE_NAME_SET                      = "CACHE_SAMPLE_NAME_SET_";
 

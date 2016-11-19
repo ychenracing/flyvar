@@ -4,8 +4,8 @@
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle" data-toggle="collapse"
 					data-target="#example-navbar-collapse">
-					<span class="sr-only">Switch</span> <span class="icon-bar"></span> <span
-						class="icon-bar"></span> <span class="icon-bar"></span>
+					<span class="sr-only">Switch</span> <span class="icon-bar"></span>
+					<span class="icon-bar"></span> <span class="icon-bar"></span>
 				</button>
 				<a class="navbar-brand" href="${basePath}">FlyVar</a>
 			</div>
@@ -15,6 +15,10 @@
 					<li id="navi_query"><a href="query.htm">Query</a></li>
 					<li id="navi_annotate"><a href="annotate.htm">Annotate</a></li>
 					<li id="navi_filter"><a href="filter.htm">Filter</a></li>
+					<li id="navi_dispensableGene"><a href="dispensableGene.htm">Dispensable
+							gene</a></li>
+					<li id="navi_sourceForDownloading"><a
+						href="sourceForDownloading.htm">Source for downloading</a></li>
 				</ul>
 			</div>
 		</div>
