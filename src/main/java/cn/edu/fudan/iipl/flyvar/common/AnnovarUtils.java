@@ -410,11 +410,6 @@ public class AnnovarUtils {
      * @return
      */
     public String getRscriptBottomForCombiningAnnotate(String combineOutputFileName) {
-        if (!Files
-            .exists(pathUtils.getAbsoluteAnnotationFilesPath().resolve(combineOutputFileName))) {
-            logger.error(combineOutputFileName + " not exists in folder:"
-                         + pathUtils.getAbsoluteAnnotationFilesPath());
-        }
         return getCombineBottom().replaceAll(getCombineBottomCombinedOutputPlaceholder(),
             pathUtils.getAbsoluteAnnotationFilesPath().resolve(combineOutputFileName).toString());
     }
@@ -431,11 +426,6 @@ public class AnnovarUtils {
                                                   String rScriptOutputFileName) {
         if (!Files.exists(pathUtils.getAbsoluteAnnotationFilesPath().resolve(rScriptFileName))) {
             logger.error(rScriptFileName + " not exists in folder:"
-                         + pathUtils.getAbsoluteAnnotationFilesPath());
-        }
-        if (!Files
-            .exists(pathUtils.getAbsoluteAnnotationFilesPath().resolve(rScriptOutputFileName))) {
-            logger.error(rScriptOutputFileName + " not exists in folder:"
                          + pathUtils.getAbsoluteAnnotationFilesPath());
         }
         return getCombineRCommand()

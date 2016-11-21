@@ -16,7 +16,7 @@
 	<div class="container">
 		<%@ include file="../common/navi.jsp"%>
 		<div class="row mtd5p">
-			<div class="span12 text-justify pd90">The filtering module
+			<div class="span12 text-justify pd80">The filtering module
 				removes polymorphisms stored in the database from user's input
 				variation files, resulting in a narrower list of candidate
 				mutations. Thus it will greatly reduce lab work to identify the
@@ -24,14 +24,14 @@
 		</div>
 
 		<div class="row mtd5p">
-			<div class="span12 text-justify pd90">
+			<div class="span12 text-justify pd80">
 				<strong>Note: Release 5 coordinates are used in this
 					database.</strong>
 			</div>
 		</div>
 
 		<div class="row mtd5p">
-			<div class="span12 text-justify pd90">
+			<div class="span12 text-justify pd80">
 				<strong>To ensure that our website work consistently, we
 					ask you to limit input file size to 200,000 lines. If your files
 					are bigger than that, we suggest you divide your files by
@@ -40,7 +40,7 @@
 			</div>
 		</div>
 
-		<div class="row mtd10p pd90">
+		<div class="row mtd10p pd80">
 			<form:form id="filterForm" role="form" commandName="filterForm"
 				method="post" action="${basePath}filter/filter.htm"
 				enctype="multipart/form-data">

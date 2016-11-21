@@ -13,7 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
+
+import cn.edu.fudan.iipl.flyvar.exception.InvalidAccessException;
 
 /**
  * Controller基类，包含一些通用方法。
@@ -28,9 +29,10 @@ public abstract class AbstractController {
     protected void checkReferer(HttpServletRequest request) {
         String userAgent = request.getHeader("User-Agent");
         String referer = request.getHeader("Referer");
-        Assert.isTrue(StringUtils.isNotBlank(userAgent) && StringUtils.isNotBlank(referer)
-                      && referer.contains("flyvar"),
-            "Invalid access！");
+        if (!StringUtils.isNotBlank(userAgent) || !StringUtils.isNotBlank(referer)
+            || !referer.contains("flyvar")) {
+            throw new InvalidAccessException("Invalid access!");
+        }
     }
 
     protected String getClientIP(HttpServletRequest request) {
@@ -59,13 +61,13 @@ public abstract class AbstractController {
     protected String getClientMACAddress(String ip) {
         String macAddress = "";
         try {
-            // 如果为127.0.0.1，则获取本地MAC地址。  
+            // 如果为127.0.0.1，则获取本地MAC地址。
             String loopbackAddress = "127.0.0.1";
             if (loopbackAddress.equals(ip)) {
                 InetAddress inetAddress = InetAddress.getLocalHost();
-                // 貌似此方法需要JDK1.6。  
+                // 貌似此方法需要JDK1.6。
                 byte[] mac = NetworkInterface.getByInetAddress(inetAddress).getHardwareAddress();
-                //下面代码是把mac地址拼装成String。
+                // 下面代码是把mac地址拼装成String。
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < mac.length; i++) {
                     if (i != 0) {

@@ -16,7 +16,7 @@
 	<div class="container">
 		<%@ include file="../common/navi.jsp"%>
 		<div class="row mtd5p">
-			<div class="span12 text-justify pd90">The annotation module
+			<div class="span12 text-justify pd80">The annotation module
 				provides a user-friendly interface to annotate variants input by the
 				users. Currently, flybase version 5.12 and ANNOVAR are used to
 				perform functional annotation. Input with standard vcf format or
@@ -30,13 +30,13 @@
 		</div>
 
 		<div class="row mtd5p">
-			<div class="span12 text-justify pd90">
+			<div class="span12 text-justify pd80">
 				<strong>Note: Release 5 coordinates are used in this
 					database.</strong>
 			</div>
 		</div>
 
-		<div class="row mtd10p pd90">
+		<div class="row mtd10p pd80">
 			<form:form id="annotateForm" role="form" commandName="annotateForm"
 				method="post" action="${basePath}annotate/annotate.htm"
 				enctype="multipart/form-data">

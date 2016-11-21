@@ -19,8 +19,11 @@ public class PathUtils {
     @Value("${file.snpSamplesPath}")
     private String snpSamplesPath;
 
-    @Value("${file.scriptFilesPath}")
-    private String scriptFilesPath;
+    @Value("${file.dispensableGenePath}")
+    private String dispensableGenePath;
+
+    @Value("${file.sourceForDownloadingPath}")
+    private String sourceForDownloadingPath;
 
     /**
      * 获取项目根路径
@@ -55,12 +58,20 @@ public class PathUtils {
         this.snpSamplesPath = snpSamplesPath;
     }
 
-    public String getScriptFilesPath() {
-        return scriptFilesPath;
+    public String getDispensableGenePath() {
+        return dispensableGenePath;
     }
 
-    public void setScriptFilesPath(String scriptFilesPath) {
-        this.scriptFilesPath = scriptFilesPath;
+    public void setDispensableGenePath(String dispensableGenePath) {
+        this.dispensableGenePath = dispensableGenePath;
+    }
+
+    public String getSourceForDownloadingPath() {
+        return sourceForDownloadingPath;
+    }
+
+    public void setSourceForDownloadingPath(String sourceForDownloadingPath) {
+        this.sourceForDownloadingPath = sourceForDownloadingPath;
     }
 
     public Path getAbsoluteUploadFilesPath() {
@@ -75,8 +86,12 @@ public class PathUtils {
         return Paths.get(getFlyvarRoot(), getSnpSamplesPath()).toAbsolutePath();
     }
 
-    public Path getAbsoluteScriptFilesPath() {
-        return Paths.get(getFlyvarRoot(), getScriptFilesPath()).toAbsolutePath();
+    public Path getAbsoluteDispensableGenePath() {
+        return Paths.get(getFlyvarRoot(), getDispensableGenePath()).toAbsolutePath();
+    }
+
+    public Path getAbsoluteSourceForDownloadingPath() {
+        return Paths.get(getFlyvarRoot(), getSourceForDownloadingPath()).toAbsolutePath();
     }
 
 }

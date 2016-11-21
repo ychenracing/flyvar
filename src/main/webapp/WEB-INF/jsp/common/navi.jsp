@@ -15,10 +15,10 @@
 					<li id="navi_query"><a href="query.htm">Query</a></li>
 					<li id="navi_annotate"><a href="annotate.htm">Annotate</a></li>
 					<li id="navi_filter"><a href="filter.htm">Filter</a></li>
-					<li id="navi_dispensableGene"><a href="dispensableGene.htm">Dispensable
+					<li id="navi_dispensable"><a href="dispensable.htm">Dispensable
 							gene</a></li>
-					<li id="navi_sourceForDownloading"><a
-						href="sourceForDownloading.htm">Source for downloading</a></li>
+					<li id="navi_source"><a
+						href="source.htm">Source for downloading</a></li>
 				</ul>
 			</div>
 		</div>

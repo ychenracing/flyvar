@@ -14,7 +14,7 @@
 <body>
 	<div class="container">
 		<%@ include file="../common/navi.jsp"%>
-		<div class="row">
+		<div class="row-fluid">
 			<div class="span12 fc">
 				<div class="table-responsive pd80">
 					<table class="table table-hover">

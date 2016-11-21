@@ -114,6 +114,7 @@ public class AnnotateServiceImpl implements AnnotateService {
      */
     @Override
     public Path mergeAnnotateResult(String annovarInputFileName) {
+        // TODO: problem exists in running R script.
         Path combinedOutputPath = null;
         try {
             List<String> combineScriptLines = Lists.newArrayList();
@@ -122,13 +123,14 @@ public class AnnotateServiceImpl implements AnnotateService {
 
             combineScriptLines.addAll(FileUtils.readLines(
                 pathUtils.getAbsoluteAnnotationFilesPath().resolve("excuteR.R").toFile(), "utf-8"));
-            combinedOutputPath = pathUtils.getAbsoluteAnnotationFilesPath()
-                .resolve(FlyvarFileUtils.getGeneratedFileName("combined_annotate_", ".variant_function"));
+            combinedOutputPath = pathUtils.getAbsoluteAnnotationFilesPath().resolve(
+                FlyvarFileUtils.getGeneratedFileName("combined_annotate_", ".variant_function"));
             combineScriptLines.add(annovarUtils
                 .getRscriptBottomForCombiningAnnotate(combinedOutputPath.getFileName().toString()));
             Path rScriptPath = pathUtils.getAbsoluteAnnotationFilesPath()
                 .resolve(FlyvarFileUtils.getGeneratedFileName("generated_r_", ".r"));
             FileUtils.writeLines(rScriptPath.toFile(), combineScriptLines);
+            logger.info("write to r script success! rScriptPath={}", rScriptPath);
             Path rScriptOutputPath = pathUtils.getAbsoluteAnnotationFilesPath()
                 .resolve(FlyvarFileUtils.getGeneratedFileName("generated_r_output_", ".txt"));
 

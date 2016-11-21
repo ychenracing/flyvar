@@ -14,18 +14,24 @@
 <body>
 	<div class="container">
 		<%@ include file="../common/navi.jsp"%>
+		<div class="row mtd5p">
+			<div class="span12 text-justify pd90">
+				<img class="width100" src="static/images/flyvar.png" />
+			</div>
+		</div>
+
 		<div class="row">
 			<div class="span12 fc">
 				<div class="table-responsive pd80">
 					<table class="table table-hover">
 						<thead>
-							<tr>Annotate Result:
-							</tr>
+							<th></th>
+							<th class="text-center">Annotate Result:</th>
 						</thead>
 						<tbody>
 							<c:if test="${annovarInput != null}">
 								<tr>
-									<td class="text-justify text-nowrap">annovar input:</td>
+									<td class="text-right">annovar input:</td>
 									<td class="text-justify text-nowrap"><a
 										href="annotate/result/${annovarInput}">annovar input</a></td>
 								</tr>
@@ -33,7 +39,7 @@
 
 							<c:if test="${annotateResult != null}">
 								<tr>
-									<td class="text-justify text-nowrap">variant function:</td>
+									<td class="text-right">variant function:</td>
 									<c:if test="${combinedExonicResult != null}">
 										<td class="text-justify text-nowrap"><a
 											href="annotate/result/${combinedExonicResult}">variant
@@ -48,8 +54,7 @@
 
 							<c:if test="${combineAnnovarOut != null}">
 								<tr>
-									<td class="text-justify text-nowrap">combined annovar
-										output:</td>
+									<td class="text-right">combined annovar output:</td>
 									<td class="text-justify text-nowrap"><a
 										href="annotate/result/${combineAnnovarOut}">combined
 											annovar output</a></td>
@@ -57,8 +62,7 @@
 							</c:if>
 							<c:if test="${annovarInvalidInput != null}">
 								<tr>
-									<td class="text-justify text-nowrap">invalid input for
-										annovar:</td>
+									<td class="text-right">invalid input for annovar:</td>
 									<td class="text-justify text-nowrap"><a
 										href="annotate/result/${annovarInvalidInput}">invalid
 											input for annovar</a></td>

@@ -24,10 +24,10 @@ function activeNavigation() {
 		$("#navi_annotate").attr("class", "active");
 	} else if (curUrl.endsWith("flyvar/filter.htm") || curUrl.endsWith("flyvar/annotate/result.htm")) {
 		$("#navi_filter").attr("class", "active");
-	} else if (curUrl.endsWith("flyvar/dispensableGene.htm")) {
-		$("#navi_dispensableGene").attr("class", "active");
-	} else if (curUrl.endsWith("flyvar/sourceForDownloading.htm")) {
-		$("#navi_sourceForDownloading").attr("class", "active");
+	} else if (curUrl.endsWith("flyvar/dispensable.htm")) {
+		$("#navi_dispensable").attr("class", "active");
+	} else if (curUrl.endsWith("flyvar/source.htm")) {
+		$("#navi_source").attr("class", "active");
 	}
 }
 

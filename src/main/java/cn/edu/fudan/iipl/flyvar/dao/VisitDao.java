@@ -21,7 +21,7 @@ import cn.edu.fudan.iipl.flyvar.model.VisitTime;
  * @version $Id: MongoDao.java, v 0.1 2016年10月24日 下午10:19:39 racing Exp $
  */
 @Repository
-public class MongoDao {
+public class VisitDao {
 
     @Autowired
     private MongoTemplate mongoTemplate;

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cn.edu.fudan.iipl.flyvar.dao.MongoDao;
+import cn.edu.fudan.iipl.flyvar.dao.VisitDao;
 import cn.edu.fudan.iipl.flyvar.model.VisitLog;
 import cn.edu.fudan.iipl.flyvar.service.VisitService;
 
@@ -23,12 +23,12 @@ public class VisitServiceImpl implements VisitService {
     private static final Logger logger = LoggerFactory.getLogger(VisitServiceImpl.class);
 
     @Autowired
-    private MongoDao            mongoDao;
+    private VisitDao            visitDao;
 
     @Override
     public void visit(VisitLog visitLog) {
-        mongoDao.addVisitLog(visitLog);
-        mongoDao.addVisitTime();
+        visitDao.addVisitLog(visitLog);
+        visitDao.addVisitTime();
 
         // int colNum = visitDao.addVisitItem(visitLog);
         // if (colNum == 0) {
@@ -43,7 +43,7 @@ public class VisitServiceImpl implements VisitService {
 
     @Override
     public Long getTotalVisitTime() {
-        return mongoDao.getVisitTime().getTime();
+        return visitDao.getVisitTime().getTime();
         // return visitDao.getTotalVisitTime();
     }
 }

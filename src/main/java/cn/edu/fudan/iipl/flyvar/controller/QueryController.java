@@ -37,6 +37,7 @@ import cn.edu.fudan.iipl.flyvar.common.FlyvarFileUtils;
 import cn.edu.fudan.iipl.flyvar.common.PathUtils;
 import cn.edu.fudan.iipl.flyvar.exception.FlyvarSystemException;
 import cn.edu.fudan.iipl.flyvar.exception.InvalidAccessException;
+import cn.edu.fudan.iipl.flyvar.exception.NotFoundException;
 import cn.edu.fudan.iipl.flyvar.form.QueryForm;
 import cn.edu.fudan.iipl.flyvar.model.QueryResultVariation;
 import cn.edu.fudan.iipl.flyvar.model.Variation;
@@ -70,8 +71,6 @@ public class QueryController extends AbstractController {
     private static final String     QUERY_BY_SAMPLE_RESULT_JSP = "query/sendEmailSuccess";
 
     private static final String     SAMPLE_LIST_JSP            = "query/sampleList";
-
-    private static final String     NOT_FOUNT_JSP              = "error/404";
 
     @Autowired
     private PathUtils               pathUtils;
@@ -208,8 +207,9 @@ public class QueryController extends AbstractController {
     private String variationSampleList(HttpServletRequest request, @RequestParam String chr,
                                        @RequestParam Long pos, @RequestParam String ref,
                                        @RequestParam String alt, Model model) {
-        if (!ref.matches("[ATCG]+") || !alt.matches("[ATCG]+"))
-            return NOT_FOUNT_JSP;
+        if (!ref.matches("[ATCG]+") || !alt.matches("[ATCG]+")) {
+            throw new NotFoundException();
+        }
         Variation variation = new Variation(chr, pos, ref, alt);
         List<Pair<String, String>> linkPairs = sampleNameService
             .getSampleLinkPair(sampleNameService.getSampleNames(variation));

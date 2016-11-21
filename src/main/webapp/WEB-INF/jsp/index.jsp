@@ -15,13 +15,13 @@
 <body>
 	<div class="container">
 		<%@ include file="common/navi.jsp"%>
-		<div class="row mtd5p">
+		<div class="row-fluid mtd5p">
 			<div class="span12 text-justify pd90">
 				<img class="width100" src="static/images/flyvar.png" />
 			</div>
 		</div>
 		<div class="row mtd5p">
-			<div class="span12 text-justify pd90">Welcome to the fly
+			<div class="span12 text-justify pd80">Welcome to the fly
 				variation database(FlyVar) website. FlyVar is a free integrative
 				platform that addresses the increasing need of next generation
 				sequencing data analysis in the Drosophila research community. It is
@@ -38,7 +38,7 @@
 				or resources.</div>
 		</div>
 		<div class="row mtd10p">
-			<div class="span12 pd90">
+			<div class="span12 pd80">
 				<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center">
 					<a href="query.htm"><img id="img_query" class="img-circle"
 						src="static/images/query_index.jpg"
@@ -47,7 +47,7 @@
 					<h3>variation query</h3>
 					<p class="text-justify">Information of variants in the database
 						could be flexibly queried based on fly strain ID, genomic
-						coordinate, a given genomic interval, and gene ID.</p>
+						coordinate, genomic interval, and gene ID.</p>
 				</div>
 				<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center">
 					<a href="annotate.htm"><img id="img_annotate"
