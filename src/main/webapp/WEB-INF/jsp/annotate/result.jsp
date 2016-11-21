@@ -26,7 +26,7 @@
 					<table class="table table-hover">
 						<thead>
 							<th></th>
-							<th class="text-center">Annotate Result:</th>
+							<th class="text-justify text-nowrap">Annotate Result:</th>
 						</thead>
 						<tbody>
 							<c:if test="${annovarInput != null}">
@@ -48,6 +48,18 @@
 									<c:if test="${combinedExonicResult == null}">
 										<td class="text-justify text-nowrap"><a
 											href="annotate/result/${annotateResult}">variant function</a></td>
+									</c:if>
+								</tr>
+							</c:if>
+
+							<c:if test="${exonicAnnotateResult != null}">
+
+								<tr>
+									<td class="text-right">exonic variant function:</td>
+									<c:if test="${combinedExonicResult == null}">
+										<td class="text-justify text-nowrap"><a
+											href="annotate/result/${exonicAnnotateResult}">exonic
+												variant function</a></td>
 									</c:if>
 								</tr>
 							</c:if>

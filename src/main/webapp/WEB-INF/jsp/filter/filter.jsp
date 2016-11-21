@@ -46,9 +46,10 @@
 				enctype="multipart/form-data">
 				<div class="row">
 					<div
-						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left vertical-center">
-						choose database</div>
-					<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right">
+						class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center pull-left vertical-center">
+						<span class="inline-block vc115">choose database</span>
+					</div>
+					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 pull-right">
 						<label class="radio"> <form:radiobutton id="db_dgrp"
 								path="variationDb" value="1" checked="checked" /> DGRP
 						</label> <label class="radio"> <form:radiobutton id="db_hugo"
@@ -65,14 +66,16 @@
 
 				<div class="row">
 					<div
-						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left vertical-center">choose
-						type</div>
-					<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right">
+						class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center pull-left vertical-center">
+						<span class="inline-block vc65">choose type</span>
+					</div>
+					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 pull-right">
 						<label class="radio"> <form:radiobutton id="four_column"
-								path="inputFormatType" value="1" checked="checked" onclick="filterByFourColumn()" /> 4 column
-							tab separated format
+								path="inputFormatType" value="1" checked="checked"
+								onclick="filterByFourColumn()" /> 4 column tab separated format
 						</label> <label class="radio"> <form:radiobutton id="vcf_format"
-								path="inputFormatType" value="2" onclick="filterByVcf()" /> vcf format
+								path="inputFormatType" value="2" onclick="filterByVcf()" /> vcf
+							format
 						</label>
 						<form:errors path="inputFormatType" cssClass="error" />
 					</div>
@@ -80,10 +83,11 @@
 
 				<div class="row">
 					<div
-						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left vertical-center">alternative
-						choice</div>
+						class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center pull-left vertical-center">
+						<span class="inline-block vc85">alternative choice</span>
+					</div>
 					<div
-						class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right form-group">
+						class="col-xs-12 col-sm-8 col-md-8 col-lg-8 pull-right form-group">
 						<div class="row">
 							<span class="text-justify"><strong>Would you want
 									to remove variations within dispensable gene regions?</strong></span>
@@ -103,9 +107,10 @@
 
 				<div class="row mtd5p">
 					<div
-						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left">input
-						or choose a file</div>
-					<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right">
+						class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center pull-left">
+						<span class="inline-block vc168">input or choose a file</span>
+					</div>
+					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 pull-right">
 						<div id="div_query_input" class="row">
 							<form:textarea path="filterInput" rows="5" id="filter_input"
 								name="filter_input" class="form-control" type="text"
@@ -126,9 +131,11 @@
 
 				<div class="row">
 					<div
-						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left">submit</div>
+						class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center pull-left">
+						<span class="inline-block vc45">submit</span>
+					</div>
 					<div
-						class="col-xs-12 col-sm-7 col-md-7 col-lg-7 text-center pull-right">
+						class="col-xs-12 col-sm-8 col-md-8 col-lg-8 text-center pull-right">
 						<div
 							class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center pull-left">
 							<button id="filter" type="button" name="filter" value="filter"

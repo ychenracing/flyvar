@@ -16,13 +16,13 @@
 	<div class="container">
 		<%@ include file="../common/navi.jsp"%>
 		<div class="row mtd5p">
-			<div class="span12 text-justify pd80">This querying module allows
-				flexible extraction of variation information from the database.
-				Three steps guide users to query the database. 'Choose database'
-				step gives a chance to determine the data source. 'Choose query
-				type' step offers various ways that permit users flexibly extract
-				what they need. And after query type is given, prompt message on
-				input format will be shown in 'Input query words' part.</div>
+			<div class="span12 text-justify pd80">This querying module
+				allows flexible extraction of variation information from the
+				database. Three steps guide users to query the database. 'Choose
+				database' step gives a chance to determine the data source. 'Choose
+				query type' step offers various ways that permit users flexibly
+				extract what they need. And after query type is given, prompt
+				message on input format will be shown in 'Input query words' part.</div>
 		</div>
 
 		<div class="row mtd5p">
@@ -38,9 +38,10 @@
 				enctype="multipart/form-data">
 				<div class="row">
 					<div
-						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left vertical-center">choose
-						database</div>
-					<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right">
+						class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center pull-left vertical-center">
+						<span class="inline-block vc115">choose database</span>
+					</div>
+					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 pull-right">
 						<label class="radio"> <form:radiobutton id="db_dgrp"
 								path="variationDb" value="1" checked="checked" /> DGRP
 						</label> <label class="radio"> <form:radiobutton id="db_hugo"
@@ -57,9 +58,10 @@
 
 				<div class="row">
 					<div
-						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left">choose
-						type</div>
-					<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right">
+						class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center pull-left">
+						<span class="inline-block vc140">choose type</span>
+					</div>
+					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 pull-right">
 						<label class="radio"> <form:radiobutton path="queryType"
 								value="1" checked="checked" onclick="queryByVariation()" /> by
 							variation (format: chr pos ref alt)
@@ -81,9 +83,10 @@
 
 				<div class="row mtd5p">
 					<div
-						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left">input
-						or choose a file</div>
-					<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right">
+						class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center pull-left">
+						<span class="inline-block vc168">input or choose a file</span>
+					</div>
+					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 pull-right">
 						<div id="div_query_input" class="row">
 							<form:textarea path="queryInput" rows="5" id="query_input"
 								name="query_input" class="form-control" type="text"
@@ -99,9 +102,9 @@
 							<form:errors path="selectSample" cssClass="error" />
 						</div>
 						<div id="div_input_email" class="row dn">
-							<div class="row text-justify">Input e-mail address for getting your
-								results:</div>
-							<div class="row">
+							<div class=" text-justify">Input e-mail address for
+								getting your results:</div>
+							<div class="">
 								<form:input path="queryEmail" id="query_email"
 									name="query_email" class="form-control"
 									placeholder="input email address" />
@@ -122,9 +125,11 @@
 
 				<div class="row">
 					<div
-						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left">submit</div>
+						class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center pull-left">
+						<span class="inline-block vc45">submit</span>
+					</div>
 					<div
-						class="col-xs-12 col-sm-7 col-md-7 col-lg-7 text-center pull-right">
+						class="col-xs-12 col-sm-8 col-md-8 col-lg-8 text-center pull-right">
 						<div
 							class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center pull-left">
 							<button id="query" type="button" name="query" value="query"

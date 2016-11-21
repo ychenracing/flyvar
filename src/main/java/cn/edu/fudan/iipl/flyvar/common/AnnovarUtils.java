@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -196,8 +197,9 @@ public class AnnovarUtils {
         return command -> {
             String returnedCommand = command
                 .replaceAll(getAnnotationPathPlaceholder(),
-                    Paths.get(pathUtils.getFlyvarRoot(), getAnnotationPath()).toAbsolutePath()
-                        .toString().replaceAll("\\\\", "/"))
+                    StringEscapeUtils
+                        .escapeJava(Paths.get(pathUtils.getFlyvarRoot(), getAnnotationPath())
+                            .toAbsolutePath().toString()))
                 .replaceAll(getVariationVcfPlaceholder(), annovarInputFileName)
                 .replaceAll(getAnnovarInputSuffixPlaceholder(), getAnnovarInputSuffix())
                 .replaceAll(getAnnotateSuffixPlaceholder(), getAnnotateSuffix())
@@ -395,10 +397,11 @@ public class AnnovarUtils {
     public List<String> getRscriptHeadersForCombiningAnnotate(String annovarInputFileName) {
         String header1 = getCombineHeaderExonAnnovateResult().replaceAll(
             getCombineHeaderExonAnnovateResultPlaceholder(),
-            getExonicAnnotatePath(annovarInputFileName).toString());
-        String header2 = getCombineHeaderAnnovateResult().replaceAll(
-            getCombineHeaderAnnovateResultPlaceholder(),
-            getAnnotatePath(annovarInputFileName).toString());
+            StringEscapeUtils.escapeJava(StringEscapeUtils
+                .escapeJava(getExonicAnnotatePath(annovarInputFileName).toString())));
+        String header2 = getCombineHeaderAnnovateResult()
+            .replaceAll(getCombineHeaderAnnovateResultPlaceholder(), StringEscapeUtils.escapeJava(
+                StringEscapeUtils.escapeJava(getAnnotatePath(annovarInputFileName).toString())));
         return Lists.newArrayList(header1, header2);
     }
 
@@ -411,7 +414,8 @@ public class AnnovarUtils {
      */
     public String getRscriptBottomForCombiningAnnotate(String combineOutputFileName) {
         return getCombineBottom().replaceAll(getCombineBottomCombinedOutputPlaceholder(),
-            pathUtils.getAbsoluteAnnotationFilesPath().resolve(combineOutputFileName).toString());
+            StringEscapeUtils.escapeJava(StringEscapeUtils.escapeJava(pathUtils
+                .getAbsoluteAnnotationFilesPath().resolve(combineOutputFileName).toString())));
     }
 
     /**
@@ -430,9 +434,11 @@ public class AnnovarUtils {
         }
         return getCombineRCommand()
             .replaceAll(getCombineRCommandRScriptPathPlaceholder(),
-                pathUtils.getAbsoluteAnnotationFilesPath().resolve(rScriptFileName).toString())
-            .replaceAll(getCombineRCommandRScriptOutputPlaceholder(), pathUtils
-                .getAbsoluteAnnotationFilesPath().resolve(rScriptOutputFileName).toString());
+                StringEscapeUtils.escapeJava(
+                    pathUtils.getAbsoluteAnnotationFilesPath().resolve(rScriptFileName).toString()))
+            .replaceAll(getCombineRCommandRScriptOutputPlaceholder(),
+                StringEscapeUtils.escapeJava(pathUtils.getAbsoluteAnnotationFilesPath()
+                    .resolve(rScriptOutputFileName).toString()));
     }
 
 }

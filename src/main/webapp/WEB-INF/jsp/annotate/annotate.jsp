@@ -42,14 +42,17 @@
 				enctype="multipart/form-data">
 				<div class="row">
 					<div
-						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left vertical-center">choose
-						type</div>
-					<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right">
+						class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center pull-left vertical-center">
+						<span class="inline-block vc65">choose type</span>
+					</div>
+					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 pull-right">
 						<label class="radio"> <form:radiobutton id="four_column"
-								path="inputFormatType" value="1" checked="checked" onclick="annotateByFourColumn()" /> 4 column tab
-							separated format
+								path="inputFormatType" value="1" checked="checked"
+								onclick="annotateByFourColumn()" /> 4 column tab separated
+							format
 						</label> <label class="radio"> <form:radiobutton id="vcf_format"
-								path="inputFormatType" value="2" onclick="annotateByVcf()" />vcf format
+								path="inputFormatType" value="2" onclick="annotateByVcf()" />vcf
+							format
 						</label>
 						<form:errors path="inputFormatType" cssClass="error" />
 					</div>
@@ -57,9 +60,10 @@
 
 				<div class="row mtd5p">
 					<div
-						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left">input
-						or choose a file</div>
-					<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7 pull-right">
+						class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center pull-left">
+						<span class="inline-block vc168">input or choose a file</span>
+					</div>
+					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 pull-right">
 						<div id="div_query_input" class="row">
 							<form:textarea path="annotateInput" rows="5" id="annotate_input"
 								name="annotate_input" class="form-control" type="text"
@@ -69,8 +73,8 @@
 						<div id="div_choose_a_file" class="row">
 							<div class="">Or Choose from a file:</div>
 							<div class="">
-								<input id="annotate_file" name="annotateFile" type="file" class="file"
-									data-show-preview="false">
+								<input id="annotate_file" name="annotateFile" type="file"
+									class="file" data-show-preview="false">
 							</div>
 						</div>
 						<form:errors path="annotateInput" cssClass="error" />
@@ -80,13 +84,15 @@
 
 				<div class="row">
 					<div
-						class="col-xs-12 col-sm-5 col-md-5 col-lg-5 text-center pull-left">submit</div>
+						class="col-xs-12 col-sm-4 col-md-4 col-lg-4 text-center pull-left">
+						<span class="inline-block vc45">submit</span>
+					</div>
 					<div
-						class="col-xs-12 col-sm-7 col-md-7 col-lg-7 text-center pull-right">
+						class="col-xs-12 col-sm-8 col-md-8 col-lg-8 text-center pull-right">
 						<div
 							class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center pull-left">
-							<button id="annotate" type="button" name="annotate" value="annotate"
-								class="btn btn-default btn-lg btn-block">annotate</button>
+							<button id="annotate" type="button" name="annotate"
+								value="annotate" class="btn btn-default btn-lg btn-block">annotate</button>
 						</div>
 					</div>
 				</div>

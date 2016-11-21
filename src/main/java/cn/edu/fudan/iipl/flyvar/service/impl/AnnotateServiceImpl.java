@@ -17,6 +17,8 @@ import com.google.common.collect.Lists;
 import cn.edu.fudan.iipl.flyvar.common.AnnovarUtils;
 import cn.edu.fudan.iipl.flyvar.common.FlyvarFileUtils;
 import cn.edu.fudan.iipl.flyvar.common.PathUtils;
+import cn.edu.fudan.iipl.flyvar.exception.CombineAnnotateResultException;
+import cn.edu.fudan.iipl.flyvar.exception.CommandFailedException;
 import cn.edu.fudan.iipl.flyvar.model.QueryResultVariation;
 import cn.edu.fudan.iipl.flyvar.model.Variation;
 import cn.edu.fudan.iipl.flyvar.service.AnnotateService;
@@ -136,9 +138,14 @@ public class AnnotateServiceImpl implements AnnotateService {
 
             String combineRunningCommand = annovarUtils.getRScriptCombineRunningCommand(
                 rScriptPath.getFileName().toString(), rScriptOutputPath.getFileName().toString());
-            commandExecutorService.execute(combineRunningCommand);
+            try {
+                commandExecutorService.execute(combineRunningCommand);
+            } catch (CommandFailedException ex) {
+                throw new CombineAnnotateResultException("combine annotate result error!");
+            }
         } catch (Exception ex) {
             logger.error("combine annotate result error!", ex);
+            throw new CombineAnnotateResultException("combine annotate result error!");
         }
         return combinedOutputPath;
     }

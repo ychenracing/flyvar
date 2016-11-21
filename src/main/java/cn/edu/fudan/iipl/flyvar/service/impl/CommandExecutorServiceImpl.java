@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
 
+import cn.edu.fudan.iipl.flyvar.exception.CommandFailedException;
 import cn.edu.fudan.iipl.flyvar.service.CommandExecutorService;
 
 @Service
@@ -74,9 +75,11 @@ public class CommandExecutorServiceImpl implements CommandExecutorService {
 
             if (process.waitFor() != 0) {
                 logger.error("Command executed failed!, cmd=" + command);
+                throw new CommandFailedException("Command executed failed!, cmd=" + command);
             }
         } catch (Exception ex) {
             logger.error("Command executed failed!, cmd=" + command, ex);
+            throw new CommandFailedException("Command executed failed!, cmd=" + command, ex);
         }
         logger.info("command execute finished! command={}", command);
     }

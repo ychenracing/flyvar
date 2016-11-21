@@ -39,6 +39,7 @@ import cn.edu.fudan.iipl.flyvar.AbstractController;
 import cn.edu.fudan.iipl.flyvar.common.AnnovarUtils;
 import cn.edu.fudan.iipl.flyvar.common.FlyvarFileUtils;
 import cn.edu.fudan.iipl.flyvar.common.PathUtils;
+import cn.edu.fudan.iipl.flyvar.exception.CombineAnnotateResultException;
 import cn.edu.fudan.iipl.flyvar.exception.InvalidAccessException;
 import cn.edu.fudan.iipl.flyvar.exception.NotFoundException;
 import cn.edu.fudan.iipl.flyvar.form.AnnotateForm;
@@ -182,10 +183,17 @@ public class AnnotateController extends AbstractController {
         redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
         redirectModel.addFlashAttribute("annotateResult",
             annotateResultPath.getFileName().toString());
+        redirectModel.addFlashAttribute("exonicAnnotateResult",
+            exonicAnnotatePath.getFileName().toString());
         if (exonicAnnotatePath.toFile().length() > 0) {
-            redirectModel.addFlashAttribute("combinedExonicResult",
-                annotateService.mergeAnnotateResult(vcfFilePath.getFileName().toString())
-                    .getFileName().toString());
+            Path combinedAnnotateResultPath = null;
+            try {
+                combinedAnnotateResultPath = annotateService
+                    .mergeAnnotateResult(vcfFilePath.getFileName().toString());
+                redirectModel.addFlashAttribute("combinedExonicResult",
+                    combinedAnnotateResultPath.getFileName().toString());
+            } catch (CombineAnnotateResultException ex) {
+            }
         }
         redirectModel.addFlashAttribute("combineAnnovarOut",
             combineAnnovarOutPath.getFileName().toString());

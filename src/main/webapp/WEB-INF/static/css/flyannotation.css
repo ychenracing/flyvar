@@ -23,9 +23,7 @@
 }
 
 .vertical-center {
-  min-height:30px;
-  line-height:30px;
-  vertical-align: middle;
+	vertical-align: middle;
 }
 
 .break-line {
@@ -46,6 +44,18 @@
 		padding-left: 0;
 		padding-right: 0;
 	}
+    .vc45 {
+    }
+    .vc65 {
+    }
+    .vc85 {
+    }
+    .vc115 {
+    }
+    .vc140 {
+    }
+    .vc168 {
+    }
 }
 
 @media all and (min-width : 768px) and (max-width : 991px) {
@@ -61,6 +71,30 @@
 		padding-left: 10%;
 		padding-right: 10%;
 	}
+    .vc45 {
+        min-height: 45px;
+        line-height: 45px;
+    }
+    .vc65 {
+        min-height: 65px;
+        line-height: 65px;
+    }
+    .vc85 {
+        min-height: 85px;
+        line-height: 85px;
+    }
+    .vc115 {
+        min-height: 115px;
+        line-height: 115px;
+    }
+    .vc140 {
+        min-height: 140px;
+        line-height: 140px;
+    }
+    .vc168 {
+        min-height: 168px;
+        line-height: 168px;
+    }
 }
 
 @media all and (min-width : 992px) and (max-width : 1199px) {
@@ -76,6 +110,30 @@
 		padding-left: 10%;
 		padding-right: 10%;
 	}
+    .vc45 {
+        min-height: 45px;
+        line-height: 45px;
+    }
+    .vc65 {
+        min-height: 65px;
+        line-height: 65px;
+    }
+    .vc85 {
+        min-height: 85px;
+        line-height: 85px;
+    }
+	.vc115 {
+        min-height: 115px;
+        line-height: 115px;
+    }
+    .vc140 {
+        min-height: 140px;
+        line-height: 140px;
+    }
+    .vc168 {
+        min-height: 168px;
+        line-height: 168px;
+    }
 }
 
 @media all and (min-width : 1200px) {
@@ -91,6 +149,30 @@
 		padding-left: 10%;
 		padding-right: 10%;
 	}
+    .vc45 {
+        min-height: 45px;
+        line-height: 45px;
+    }
+    .vc65 {
+        min-height: 65px;
+        line-height: 65px;
+    }
+    .vc85 {
+        min-height: 85px;
+        line-height: 85px;
+    }
+	.vc115 {
+		min-height: 115px;
+		line-height: 115px;
+	}
+    .vc140 {
+        min-height: 140px;
+        line-height: 140px;
+    }
+    .vc168 {
+        min-height: 168px;
+        line-height: 168px;
+    }
 }
 
 a:link {

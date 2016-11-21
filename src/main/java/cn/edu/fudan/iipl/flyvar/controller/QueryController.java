@@ -4,6 +4,7 @@
 package cn.edu.fudan.iipl.flyvar.controller;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +36,7 @@ import cn.edu.fudan.iipl.flyvar.AbstractController;
 import cn.edu.fudan.iipl.flyvar.common.AnnovarUtils;
 import cn.edu.fudan.iipl.flyvar.common.FlyvarFileUtils;
 import cn.edu.fudan.iipl.flyvar.common.PathUtils;
+import cn.edu.fudan.iipl.flyvar.exception.CombineAnnotateResultException;
 import cn.edu.fudan.iipl.flyvar.exception.FlyvarSystemException;
 import cn.edu.fudan.iipl.flyvar.exception.InvalidAccessException;
 import cn.edu.fudan.iipl.flyvar.exception.NotFoundException;
@@ -289,6 +291,49 @@ public class QueryController extends AbstractController {
     }
 
     /**
+     * add annotate redirect attributes
+     * 
+     * @param redirectModel
+     * @param queryResult
+     */
+    private void addAnnotateRedirectAttributes(RedirectAttributes redirectModel,
+                                               Path annotateResultVcfPath) {
+
+        Path annovarInputPath = annovarUtils
+            .getAnnovarInputPath(annotateResultVcfPath.getFileName().toString());
+        Path annotateResultPath = annovarUtils
+            .getAnnotatePath(annotateResultVcfPath.getFileName().toString());
+        Path exonicAnnotatePath = annovarUtils
+            .getExonicAnnotatePath(annotateResultVcfPath.getFileName().toString());
+        Path combineAnnovarOutPath = annovarUtils
+            .getCombineAnnovarOutPath(annotateResultVcfPath.getFileName().toString());
+        Path annovarInvalidInputPath = annovarUtils
+            .getAnnovarInvalidInputPath(annotateResultVcfPath.getFileName().toString());
+
+        redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
+        redirectModel.addFlashAttribute("annotateResult",
+            annotateResultPath.getFileName().toString());
+        redirectModel.addFlashAttribute("exonicAnnotateResult",
+            exonicAnnotatePath.getFileName().toString());
+        if (exonicAnnotatePath.toFile().length() > 0) {
+            Path combinedAnnotateResultPath = null;
+            try {
+                combinedAnnotateResultPath = annotateService
+                    .mergeAnnotateResult(annovarInputPath.getFileName().toString());
+                redirectModel.addFlashAttribute("combinedExonicResult",
+                    combinedAnnotateResultPath.getFileName().toString());
+            } catch (CombineAnnotateResultException ex) {
+            }
+        }
+        redirectModel.addFlashAttribute("combineAnnovarOut",
+            combineAnnovarOutPath.getFileName().toString());
+        if (annovarInvalidInputPath.toFile().exists()) {
+            redirectModel.addFlashAttribute("annovarInvalidInput",
+                annovarInvalidInputPath.getFileName().toString());
+        }
+    }
+
+    /**
      * query and annotate by variation processing.
      * 
      * @param queryForm
@@ -318,31 +363,7 @@ public class QueryController extends AbstractController {
         List<QueryResultVariation> queryResult = queryService.queryByVariation(variations,
             VariationDataBaseType.of(queryForm.getVariationDb()));
         Path annotateResultVcfPath = queryService.annotateResultVariation(queryResult);
-        Path annovarInputPath = annovarUtils
-            .getAnnovarInputPath(annotateResultVcfPath.getFileName().toString());
-        Path annotateResultPath = annovarUtils
-            .getAnnotatePath(annotateResultVcfPath.getFileName().toString());
-        Path exonicAnnotatePath = annovarUtils
-            .getExonicAnnotatePath(annotateResultVcfPath.getFileName().toString());
-        Path combineAnnovarOutPath = annovarUtils
-            .getCombineAnnovarOutPath(annotateResultVcfPath.getFileName().toString());
-        Path annovarInvalidInputPath = annovarUtils
-            .getAnnovarInvalidInputPath(annotateResultVcfPath.getFileName().toString());
-
-        redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
-        redirectModel.addFlashAttribute("annotateResult",
-            annotateResultPath.getFileName().toString());
-        if (exonicAnnotatePath.toFile().length() > 0) {
-            redirectModel.addFlashAttribute("combinedExonicResult",
-                annotateService.mergeAnnotateResult(annovarInputPath.getFileName().toString())
-                    .getFileName().toString());
-        }
-        redirectModel.addFlashAttribute("combineAnnovarOut",
-            combineAnnovarOutPath.getFileName().toString());
-        if (annovarInvalidInputPath.toFile().exists()) {
-            redirectModel.addFlashAttribute("annovarInvalidInput",
-                annovarInvalidInputPath.getFileName().toString());
-        }
+        addAnnotateRedirectAttributes(redirectModel, annotateResultVcfPath);
         return true;
     }
 
@@ -376,38 +397,17 @@ public class QueryController extends AbstractController {
             cacheService.set(sampleVariationsKey, variations);
         }
         String sampleAnnotateResultKey = Constants.CACHE_SAMPLE_ANNOTATE_RESULT + realSampleName;
-        Path annotateResultVcfPath = cacheService.get(sampleAnnotateResultKey);
-        if (annotateResultVcfPath == null) {
+        String cachePath = cacheService.get(sampleAnnotateResultKey);
+        Path annotateResultVcfPath = null;
+        if (cachePath == null) {
             Path vcfFormatVariationPath = annotateService.convertVariationsToVcfFile(variations);
             annotateResultVcfPath = annotateService
                 .annotateVcfFormatVariation(vcfFormatVariationPath);
-            cacheService.set(sampleAnnotateResultKey, annotateResultVcfPath);
+            cacheService.set(sampleAnnotateResultKey, annotateResultVcfPath.toString());
+        } else {
+            annotateResultVcfPath = Paths.get(cachePath);
         }
-        Path annovarInputPath = annovarUtils
-            .getAnnovarInputPath(annotateResultVcfPath.getFileName().toString());
-        Path annotateResultPath = annovarUtils
-            .getAnnotatePath(annotateResultVcfPath.getFileName().toString());
-        Path exonicAnnotatePath = annovarUtils
-            .getExonicAnnotatePath(annotateResultVcfPath.getFileName().toString());
-        Path combineAnnovarOutPath = annovarUtils
-            .getCombineAnnovarOutPath(annotateResultVcfPath.getFileName().toString());
-        Path annovarInvalidInputPath = annovarUtils
-            .getAnnovarInvalidInputPath(annotateResultVcfPath.getFileName().toString());
-
-        redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
-        redirectModel.addFlashAttribute("annotateResult",
-            annotateResultPath.getFileName().toString());
-        if (exonicAnnotatePath.toFile().length() > 0) {
-            redirectModel.addFlashAttribute("combinedExonicResult",
-                annotateService.mergeAnnotateResult(annovarInputPath.getFileName().toString())
-                    .getFileName().toString());
-        }
-        redirectModel.addFlashAttribute("combineAnnovarOut",
-            combineAnnovarOutPath.getFileName().toString());
-        if (annovarInvalidInputPath.toFile().exists()) {
-            redirectModel.addFlashAttribute("annovarInvalidInput",
-                annovarInvalidInputPath.getFileName().toString());
-        }
+        addAnnotateRedirectAttributes(redirectModel, annotateResultVcfPath);
         return true;
     }
 
@@ -476,32 +476,7 @@ public class QueryController extends AbstractController {
         List<QueryResultVariation> queryResult = queryService.queryByRegion(regions,
             VariationDataBaseType.of(queryForm.getVariationDb()));
         Path annotateResultVcfPath = queryService.annotateResultVariation(queryResult);
-        Path annovarInputPath = annovarUtils
-            .getAnnovarInputPath(annotateResultVcfPath.getFileName().toString());
-        Path annotateResultPath = annovarUtils
-            .getAnnotatePath(annotateResultVcfPath.getFileName().toString());
-        Path exonicAnnotatePath = annovarUtils
-            .getExonicAnnotatePath(annotateResultVcfPath.getFileName().toString());
-        Path combineAnnovarOutPath = annovarUtils
-            .getCombineAnnovarOutPath(annotateResultVcfPath.getFileName().toString());
-        Path annovarInvalidInputPath = annovarUtils
-            .getAnnovarInvalidInputPath(annotateResultVcfPath.getFileName().toString());
-
-        redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
-        redirectModel.addFlashAttribute("annotateResult",
-            annotateResultPath.getFileName().toString());
-        if (exonicAnnotatePath.toFile().length() > 0) {
-            redirectModel.addFlashAttribute("combinedExonicResult",
-                annotateService.mergeAnnotateResult(annovarInputPath.getFileName().toString())
-                    .getFileName().toString());
-        }
-        redirectModel.addFlashAttribute("combineAnnovarOut",
-            combineAnnovarOutPath.getFileName().toString());
-        if (annovarInvalidInputPath.toFile().exists()) {
-            redirectModel.addFlashAttribute("annovarInvalidInput",
-                annovarInvalidInputPath.getFileName().toString());
-        }
-
+        addAnnotateRedirectAttributes(redirectModel, annotateResultVcfPath);
         return true;
     }
 
@@ -569,31 +544,7 @@ public class QueryController extends AbstractController {
         List<QueryResultVariation> queryResult = queryService.queryByGeneNameWholeRegion(geneNames,
             VariationDataBaseType.of(queryForm.getVariationDb()));
         Path annotateResultVcfPath = queryService.annotateResultVariation(queryResult);
-        Path annovarInputPath = annovarUtils
-            .getAnnovarInputPath(annotateResultVcfPath.getFileName().toString());
-        Path annotateResultPath = annovarUtils
-            .getAnnotatePath(annotateResultVcfPath.getFileName().toString());
-        Path exonicAnnotatePath = annovarUtils
-            .getExonicAnnotatePath(annotateResultVcfPath.getFileName().toString());
-        Path combineAnnovarOutPath = annovarUtils
-            .getCombineAnnovarOutPath(annotateResultVcfPath.getFileName().toString());
-        Path annovarInvalidInputPath = annovarUtils
-            .getAnnovarInvalidInputPath(annotateResultVcfPath.getFileName().toString());
-
-        redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
-        redirectModel.addFlashAttribute("annotateResult",
-            annotateResultPath.getFileName().toString());
-        if (exonicAnnotatePath.toFile().length() > 0) {
-            redirectModel.addFlashAttribute("combinedExonicResult",
-                annotateService.mergeAnnotateResult(annovarInputPath.getFileName().toString())
-                    .getFileName().toString());
-        }
-        redirectModel.addFlashAttribute("combineAnnovarOut",
-            combineAnnovarOutPath.getFileName().toString());
-        if (annovarInvalidInputPath.toFile().exists()) {
-            redirectModel.addFlashAttribute("annovarInvalidInput",
-                annovarInvalidInputPath.getFileName().toString());
-        }
+        addAnnotateRedirectAttributes(redirectModel, annotateResultVcfPath);
         return true;
     }
 
@@ -661,31 +612,7 @@ public class QueryController extends AbstractController {
         List<QueryResultVariation> queryResult = queryService.queryByGeneNameExonRegion(geneNames,
             VariationDataBaseType.of(queryForm.getVariationDb()));
         Path annotateResultVcfPath = queryService.annotateResultVariation(queryResult);
-        Path annovarInputPath = annovarUtils
-            .getAnnovarInputPath(annotateResultVcfPath.getFileName().toString());
-        Path annotateResultPath = annovarUtils
-            .getAnnotatePath(annotateResultVcfPath.getFileName().toString());
-        Path exonicAnnotatePath = annovarUtils
-            .getExonicAnnotatePath(annotateResultVcfPath.getFileName().toString());
-        Path combineAnnovarOutPath = annovarUtils
-            .getCombineAnnovarOutPath(annotateResultVcfPath.getFileName().toString());
-        Path annovarInvalidInputPath = annovarUtils
-            .getAnnovarInvalidInputPath(annotateResultVcfPath.getFileName().toString());
-
-        redirectModel.addFlashAttribute("annovarInput", annovarInputPath.getFileName().toString());
-        redirectModel.addFlashAttribute("annotateResult",
-            annotateResultPath.getFileName().toString());
-        if (exonicAnnotatePath.toFile().length() > 0) {
-            redirectModel.addFlashAttribute("combinedExonicResult",
-                annotateService.mergeAnnotateResult(annovarInputPath.getFileName().toString())
-                    .getFileName().toString());
-        }
-        redirectModel.addFlashAttribute("combineAnnovarOut",
-            combineAnnovarOutPath.getFileName().toString());
-        if (annovarInvalidInputPath.toFile().exists()) {
-            redirectModel.addFlashAttribute("annovarInvalidInput",
-                annovarInvalidInputPath.getFileName().toString());
-        }
+        addAnnotateRedirectAttributes(redirectModel, annotateResultVcfPath);
         return true;
     }
 }
