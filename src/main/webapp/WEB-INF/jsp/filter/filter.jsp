@@ -124,6 +124,16 @@
 									class="file" data-show-preview="false">
 							</div>
 						</div>
+						<div id="div_input_email" class="row dn">
+                            <div class=" text-justify">Input e-mail address for
+                                getting your results:</div>
+                            <div class="">
+                                <form:input path="filterEmail" id="filter_email"
+                                    name="filter_email" class="form-control"
+                                    placeholder="input email address" />
+                                <form:errors path="filterEmail" cssClass="error" />
+                            </div>
+                        </div>
 						<form:errors path="filterInput" cssClass="error" />
 					</div>
 				</div>

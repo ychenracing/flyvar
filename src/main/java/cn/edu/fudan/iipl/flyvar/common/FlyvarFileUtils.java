@@ -3,6 +3,7 @@ package cn.edu.fudan.iipl.flyvar.common;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,6 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
+
+import cn.edu.fudan.iipl.flyvar.model.Variation;
 
 public class FlyvarFileUtils {
 
@@ -65,13 +68,26 @@ public class FlyvarFileUtils {
     }
 
     public static Path writeLinesToPath(List<String> lines, String _path) {
-        Path path = Paths.get(_path);
+        return writeLinesToPath(lines, Paths.get(_path));
+    }
+
+    public static Path writeLinesToPath(List<String> lines, Path path) {
         try {
             FileUtils.writeLines(path.toFile(), lines);
         } catch (IOException ex) {
             logger.error("write lines to file error! path=" + path, ex);
         }
         return path;
+    }
+
+    public static Path writeVariationsToFile(Path outputPath, Collection<Variation> variations) {
+        String filename = getGeneratedFileName("variations_", ".txt");
+        Path filepath = outputPath.resolve(filename);
+        writeLinesToPath(variations.stream().map(variation -> {
+            return variation.getChr() + "\t" + variation.getPos() + "\t" + variation.getRef() + "\t"
+                   + variation.getAlt();
+        }).collect(Collectors.toList()), filepath);
+        return outputPath;
     }
 
     public static String getGeneratedFileName(String prefix, String ext) {

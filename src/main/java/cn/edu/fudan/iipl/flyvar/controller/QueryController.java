@@ -3,6 +3,8 @@
  */
 package cn.edu.fudan.iipl.flyvar.controller;
 
+import java.io.IOException;
+import java.net.URLConnection;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -19,11 +21,15 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -68,6 +74,8 @@ public class QueryController extends AbstractController {
     private static final Logger     logger                     = LoggerFactory
         .getLogger(QueryController.class);
 
+    private static final int        ASYNC_SIZE                 = 300000;
+
     private static final String     QUERY_JSP                  = "query/query";
 
     private static final String     QUERY_RESULT_JSP           = "query/result";
@@ -75,6 +83,8 @@ public class QueryController extends AbstractController {
     private static final String     QUERY_BY_SAMPLE_RESULT_JSP = "query/sendEmailSuccess";
 
     private static final String     SAMPLE_LIST_JSP            = "query/sampleList";
+
+    private static final String     QUERY_ASYNC_RESULT_JSP     = "query/asyncResult";
 
     private static final String     EMAIL_PATTERN              = "^(.+)@(.+)$";
 
@@ -98,9 +108,6 @@ public class QueryController extends AbstractController {
 
     @Autowired
     private CacheService            cacheService;
-
-    @Autowired
-    private ThreadPoolTaskExecutor  taskExecutor;
 
     @RequestMapping(value = { "/query.htm" }, method = { RequestMethod.GET })
     public String showQuery(Model model) {
@@ -132,8 +139,46 @@ public class QueryController extends AbstractController {
         boolean success = false;
         switch (queryType) {
             case VARIATION:
-                success = queryByVariation(queryForm, bindings, queryFile, redirectModel, model);
-                return success ? "redirect:/query/result.htm" : QUERY_JSP;
+                String variationStr = queryForm.getQueryInput();
+                if (StringUtils.isBlank(variationStr)) {
+                    variationStr = FlyvarFileUtils.readFileToStringDiscardHeader(
+                        FlyvarFileUtils.saveUploadFileAndGetFilePath(queryFile,
+                            pathUtils.getAbsoluteUploadFilesPath().toString()));
+                }
+                Set<Variation> variations = Variation.convertInputToVariations(variationStr);
+                if (CollectionUtils.isEmpty(variations)) {
+                    model.addAttribute("queryForm", queryForm);
+                    bindings.rejectValue("queryInput", "error.queryInputFormat");
+                    logger.info(
+                        "error submit! error format for variation input or file: queryForm={}",
+                        queryForm);
+                    return QUERY_JSP;
+                }
+
+                /** if lines of the variations to query is above ASYNC_SIZE, do async annotate */
+                if (StringUtils.isNotBlank(queryForm.getQueryEmail())
+                    && queryForm.getQueryEmail().matches(EMAIL_PATTERN)
+                    || variations.size() > ASYNC_SIZE) {
+                    if (StringUtils.isBlank(queryForm.getQueryEmail())
+                        || !queryForm.getQueryEmail().matches(EMAIL_PATTERN)) {
+                        model.addAttribute("queryForm", queryForm);
+                        bindings.rejectValue("queryForm", "error.queryForm");
+                        logger.info("error submit! error format for queryEmail: queryForm={}",
+                            queryForm);
+                        return QUERY_JSP;
+                    }
+                    queryService.asyncQueryAndSendEmail(variations,
+                        VariationDataBaseType.of(queryForm.getVariationDb()),
+                        queryForm.getQueryEmail());
+                    redirectModel.addFlashAttribute("asyncSuccess", true);
+                    return "redirect:/query/async/result.htm";
+                }
+
+                List<QueryResultVariation> queryResult = queryService.queryByVariation(variations,
+                    VariationDataBaseType.of(queryForm.getVariationDb()));
+                redirectModel.addFlashAttribute("queryResult", queryResult);
+                redirectModel.addFlashAttribute("queryType", queryForm.getVariationDb());
+                return "redirect:/query/result.htm";
             case SAMPLE:
                 String realSampleName = "DGRP-" + queryForm.getSelectSample().substring(5, 8)
                                         + ".SNP.only_homo";
@@ -195,8 +240,11 @@ public class QueryController extends AbstractController {
             return QUERY_JSP;
         }
 
-        /** if lines of the variations to annotate is above 300,000, do async annotate */
-        if (queryResult.size() > 300000) {
+        /** if lines of the variations to annotate is above ASYNC_SIZE, do async annotate */
+        if (StringUtils.isNotBlank(queryForm.getQueryEmail())
+            && queryForm.getQueryEmail().matches(EMAIL_PATTERN)
+            || QueryType.VARIATION == QueryType.of(queryForm.getQueryType())
+               && queryResult.size() > ASYNC_SIZE) {
             if (StringUtils.isBlank(queryForm.getQueryEmail())
                 || !queryForm.getQueryEmail().matches(EMAIL_PATTERN)) {
                 model.addAttribute("queryForm", queryForm);
@@ -204,35 +252,12 @@ public class QueryController extends AbstractController {
                 logger.info("error submit! error format for queryEmail: queryForm={}", queryForm);
                 return QUERY_JSP;
             }
-            final List<QueryResultVariation> finalQueryResult = queryResult;
-            taskExecutor.execute(() -> {
-                Path annotateResultVcfPath = queryService.annotateResultVariation(finalQueryResult);
-                /** async annotate variations. This operation will process data background and send results via email to user later. */
-                annotateService.asyncAnnotateVcfFormatVariation(annotateResultVcfPath,
-                    queryForm.getQueryEmail());
-            });
+            queryService.asyncAnnotateAndSendEmail(queryResult, queryForm.getQueryEmail());
             redirectModel.addFlashAttribute("asyncSuccess", true);
             return "redirect:/annotate/async/result.htm";
         }
 
         Path annotateResultVcfPath = queryService.annotateResultVariation(queryResult);
-
-        /** if the file size is above 20M, do async annotate */
-        if (FileUtils.sizeOf(annotateResultVcfPath.toFile()) > 20 * 1024 * 1024l) {
-            if (StringUtils.isBlank(queryForm.getQueryEmail())
-                || !queryForm.getQueryEmail().matches(EMAIL_PATTERN)) {
-                model.addAttribute("queryForm", queryForm);
-                bindings.rejectValue("queryForm", "error.queryForm");
-                logger.info("error submit! error format for queryEmail: queryForm={}", queryForm);
-                return QUERY_JSP;
-            }
-            /** async annotate variations. This operation will process data background and send results via email to user later. */
-            annotateService.asyncAnnotateVcfFormatVariation(annotateResultVcfPath,
-                queryForm.getQueryEmail());
-            redirectModel.addFlashAttribute("asyncSuccess", true);
-            return "redirect:/annotate/async/result.htm";
-        }
-
         addAnnotateRedirectAttributes(redirectModel, annotateResultVcfPath);
         return "redirect:/annotate/result.htm";
     }
@@ -244,6 +269,42 @@ public class QueryController extends AbstractController {
             throw new InvalidAccessException("Invalid access!");
         }
         return QUERY_RESULT_JSP;
+    }
+
+    @RequestMapping(value = { "/query/async/result.htm" }, method = { RequestMethod.GET })
+    public String showAsyncQueryResult(HttpServletRequest request, Model model) {
+        checkReferer(request);
+        if (!model.containsAttribute("asyncSuccess")) {
+            throw new InvalidAccessException("Invalid access!");
+        }
+        return QUERY_ASYNC_RESULT_JSP;
+    }
+
+    @RequestMapping(value = { "/query/result/{filename:.+}" }, method = { RequestMethod.GET })
+    public ResponseEntity<byte[]> downloadQueryResult(HttpServletRequest request,
+                                                      @PathVariable String filename,
+                                                      Model model) throws IOException {
+        if (StringUtils.isBlank(filename)) {
+            logger.warn("filename is blank!");
+            throw new NotFoundException();
+        }
+        Path filePath = pathUtils.getAbsoluteAnnotationFilesPath().resolve(filename);
+        if (!filePath.toFile().exists()) {
+            logger.warn("file not exists! filename={}", filename);
+            throw new NotFoundException();
+        }
+
+        String mimeType = URLConnection.guessContentTypeFromName(filePath.getFileName().toString());
+        if (mimeType == null) {
+            mimeType = "application/octet-stream";
+            // logger.info("mimetype is not detectable, will take default. mimeType={}", mimeType);
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(mimeType));
+        headers.setContentDispositionFormData("attachment", filePath.getFileName().toString());
+        logger.info("download file! ip={}, filePath={}", getClientIP(request), filePath);
+        return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(filePath.toFile()), headers,
+            HttpStatus.CREATED);
     }
 
     @RequestMapping(value = { "/query/sample/success.htm" }, method = { RequestMethod.GET })

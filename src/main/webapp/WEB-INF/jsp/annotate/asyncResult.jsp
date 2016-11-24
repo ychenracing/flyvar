@@ -23,7 +23,7 @@
 		<div class="row mtd10">
 			<div class="span12 fc">
 				<div class="table-responsive pd80">
-					<span class="text-justify">Your annotate result are
+					<span class="text-justify">Your annotate results are
 						processing! We'll send you an email to download your results in
 						few minutes.</span>
 				</div>

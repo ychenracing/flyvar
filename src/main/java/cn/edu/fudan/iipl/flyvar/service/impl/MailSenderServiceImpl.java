@@ -108,16 +108,17 @@ public class MailSenderServiceImpl implements MailSenderService {
                         // 这里的方法调用和插入图片是不同的，解决附件名称的中文问题
                         helper.addAttachment(MimeUtility.encodeWord(file.getName()), file);
                     } catch (UnsupportedEncodingException | MessagingException ex) {
-                        logger.error("添加邮件附件失败！attachmentFilePath=" + attachmentFilePath, ex);
+                        logger.error(
+                            "Add attachment failed！attachmentFilePath=" + attachmentFilePath, ex);
                     }
                 });
             }
 
             mailSender.send(msg);
-            logger.info("模板邮件发送成功！receiver={}", receiver);
+            logger.info("Template email sent success! receiver={}", receiver);
         } catch (Exception ex) {
-            logger.error("模板邮件发送失败！", ex);
-            throw new RuntimeException("系统错误！邮件发送失败！");
+            logger.error("Template email sent failed!", ex);
+            throw new RuntimeException("System error! Template email sent failed!");
         }
 
     }

@@ -9,12 +9,37 @@
 		$("#queryForm").submit();
 	});
 	$(document).on('click', '#query_and_annotate', function() {
+		if (!checkInputOrFileSize()) {
+			showEmailInput();
+			return;
+		}
 		waitingDialog.show();
 		$("#queryForm").attr("action", "query/annotate.htm");
 		disableVariationDb(false);
 		$("#queryForm").submit();
 	});
 })();
+
+function checkInputOrFileSize() {
+	var queryInput = $("#query_input").val();
+	var queryFile = $("#query_file");
+	var queryEmail = $("#query_email").val();
+	var emailPattern = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+	if (queryInput != "") {
+		return true;
+	}
+	if (queryFile.val() != "" && queryFile[0].files[0].size > 20 * 1024 * 1024) {
+		if (emailPattern.test(queryEmail)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function showEmailInput() {
+	$("#div_input_email").removeClass("dn");
+	$("#query_email").focus();
+}
 
 function disableVariationDb(disable) {
 	$('input:radio[name="variationDb"]').prop("disabled", disable);

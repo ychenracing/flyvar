@@ -67,6 +67,8 @@ public class AnnotateController extends AbstractController {
 
     private static final String EMAIL_PATTERN             = "^(.+)@(.+)$";
 
+    private static final long   ASYNC_FILE_SIZE           = 30 * 1024 * 1024l;
+
     @Autowired
     private PathUtils           pathUtils;
 
@@ -181,8 +183,10 @@ public class AnnotateController extends AbstractController {
             }
         }
 
-        /** if the file size is above 30M, do async annotate */
-        if (FileUtils.sizeOf(vcfFilePath.toFile()) > 30 * 1024 * 1024l) {
+        /** if the file size is above ASYNC_FILE_SIZE, do async annotate */
+        if (StringUtils.isNotBlank(annotateForm.getAnnotateEmail())
+            && annotateForm.getAnnotateEmail().matches(EMAIL_PATTERN)
+            || FileUtils.sizeOf(vcfFilePath.toFile()) > ASYNC_FILE_SIZE) {
             if (StringUtils.isBlank(annotateForm.getAnnotateEmail())
                 || !annotateForm.getAnnotateEmail().matches(EMAIL_PATTERN)) {
                 model.addAttribute("annotateForm", annotateForm);

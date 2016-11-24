@@ -3,6 +3,8 @@
  */
 package cn.edu.fudan.iipl.flyvar.controller;
 
+import java.io.IOException;
+import java.net.URLConnection;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -15,10 +17,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +37,7 @@ import cn.edu.fudan.iipl.flyvar.common.FlyvarFileUtils;
 import cn.edu.fudan.iipl.flyvar.common.PathUtils;
 import cn.edu.fudan.iipl.flyvar.exception.CombineAnnotateResultException;
 import cn.edu.fudan.iipl.flyvar.exception.InvalidAccessException;
+import cn.edu.fudan.iipl.flyvar.exception.NotFoundException;
 import cn.edu.fudan.iipl.flyvar.form.FilterForm;
 import cn.edu.fudan.iipl.flyvar.model.Variation;
 import cn.edu.fudan.iipl.flyvar.model.constants.FilterInputType;
@@ -47,13 +55,18 @@ import cn.edu.fudan.iipl.flyvar.service.FilterService;
 @Controller
 public class FilterController extends AbstractController {
 
-    private static final Logger logger            = LoggerFactory.getLogger(FilterController.class);
+    private static final Logger logger                  = LoggerFactory
+        .getLogger(FilterController.class);
 
-    private static final String FILTER_JSP        = "filter/filter";
+    private static final int    ASYNC_SIZE              = 300000;
 
-    private static final String FILTER_RESULT_JSP = "filter/result";
+    private static final String FILTER_JSP              = "filter/filter";
 
-    private static final String EMAIL_PATTERN     = "^(.+)@(.+)$";
+    private static final String FILTER_RESULT_JSP       = "filter/result";
+
+    private static final String FILTER_ASYNC_RESULT_JSP = "filter/asyncResult";
+
+    private static final String EMAIL_PATTERN           = "^(.+)@(.+)$";
 
     @Autowired
     private PathUtils           pathUtils;
@@ -74,9 +87,9 @@ public class FilterController extends AbstractController {
     }
 
     @RequestMapping(value = { "/filter/filter.htm" }, method = { RequestMethod.POST })
-    public String doQuery(HttpServletRequest request, @Valid FilterForm filterForm,
-                          BindingResult bindings, MultipartFile filterFile,
-                          RedirectAttributes redirectModel, Model model) {
+    public String doFilter(HttpServletRequest request, @Valid FilterForm filterForm,
+                           BindingResult bindings, MultipartFile filterFile,
+                           RedirectAttributes redirectModel, Model model) {
         checkReferer(request);
         boolean correctParams = validateFilterParams(request, filterForm, bindings, filterFile,
             model);
@@ -107,13 +120,33 @@ public class FilterController extends AbstractController {
             return FILTER_JSP;
         }
 
+        /** if the file size is above ASYNC_SIZE, do async filter */
+        if (StringUtils.isNotBlank(filterForm.getFilterEmail())
+            && filterForm.getFilterEmail().matches(EMAIL_PATTERN)
+            || variations.size() > ASYNC_SIZE) {
+            if (StringUtils.isBlank(filterForm.getFilterEmail())
+                || !filterForm.getFilterEmail().matches(EMAIL_PATTERN)) {
+                model.addAttribute("filterForm", filterForm);
+                bindings.rejectValue("filterEmail", "error.filter.filterEmail");
+                logger.info("error submit! error format for filterEmail: filterForm={}",
+                    filterForm);
+                return FILTER_JSP;
+            }
+            /** async filter variations. This operation will process data background and send results via email to user later. */
+            filterService.asyncFilterAndSendEmail(variations,
+                VariationDataBaseType.of(filterForm.getVariationDb()),
+                RemoveDispensableType.of(filterForm.getRemoveDispensable()),
+                filterForm.getFilterEmail());
+            redirectModel.addFlashAttribute("asyncSuccess", true);
+            return "redirect:/filter/async/result.htm";
+        }
+
         List<Variation> filterResult = filterService.filterVariations(variations,
             VariationDataBaseType.of(filterForm.getVariationDb()));
         if (RemoveDispensableType
             .of(filterForm.getRemoveDispensable()) == RemoveDispensableType.YES) {
             filterResult = filterService.filterDispensableGeneVariations(variations);
         }
-
         redirectModel.addFlashAttribute("filterResult", filterResult);
         return "redirect:/filter/result.htm";
     }
@@ -151,6 +184,28 @@ public class FilterController extends AbstractController {
                 filterForm);
             return FILTER_JSP;
         }
+
+        /** if the variation size is above ASYNC_SIZE, do async filter */
+        if (StringUtils.isNotBlank(filterForm.getFilterEmail())
+            && filterForm.getFilterEmail().matches(EMAIL_PATTERN)
+            || variations.size() > ASYNC_SIZE) {
+            if (StringUtils.isBlank(filterForm.getFilterEmail())
+                || !filterForm.getFilterEmail().matches(EMAIL_PATTERN)) {
+                model.addAttribute("filterForm", filterForm);
+                bindings.rejectValue("filterEmail", "error.filter.filterEmail");
+                logger.info("error submit! error format for filterEmail: filterForm={}",
+                    filterForm);
+                return FILTER_JSP;
+            }
+            /** async filter and annovate variations. This operation will process data background and send results via email to user later. */
+            filterService.asyncFilterAnnotateAndSendEmail(variations,
+                VariationDataBaseType.of(filterForm.getVariationDb()),
+                RemoveDispensableType.of(filterForm.getRemoveDispensable()),
+                filterForm.getFilterEmail());
+            redirectModel.addFlashAttribute("asyncSuccess", true);
+            return "redirect:/annotate/async/result.htm";
+        }
+
         List<Variation> filterResult = filterService.filterVariations(variations,
             VariationDataBaseType.of(filterForm.getVariationDb()));
         if (RemoveDispensableType
@@ -159,24 +214,7 @@ public class FilterController extends AbstractController {
         }
         Path vcfFilePath = annotateService.convertVariationsToVcfFile(filterResult);
 
-        /** if the file size is above 30M, do async annotate */
-        if (FileUtils.sizeOf(vcfFilePath.toFile()) > 30 * 1024 * 1024l) {
-            if (StringUtils.isBlank(filterForm.getFilterEmail())
-                || !filterForm.getFilterEmail().matches(EMAIL_PATTERN)) {
-                model.addAttribute("filterForm", filterForm);
-                bindings.rejectValue("filterForm", "error.filter.filterForm");
-                logger.info("error submit! error format for filterEmail: filterForm={}",
-                    filterForm);
-                return FILTER_JSP;
-            }
-            /** async annotate variations. This operation will process data background and send results via email to user later. */
-            annotateService.asyncAnnotateVcfFormatVariation(vcfFilePath,
-                filterForm.getFilterEmail());
-            redirectModel.addFlashAttribute("asyncSuccess", true);
-            return "redirect:/annotate/async/result.htm";
-        }
-
-        annotateService.annotateVcfFormatVariation(vcfFilePath);
+        vcfFilePath = annotateService.annotateVcfFormatVariation(vcfFilePath);
         Path annovarInputPath = annovarUtils
             .getAnnovarInputPath(vcfFilePath.getFileName().toString());
         Path annotateResultPath = annovarUtils
@@ -219,6 +257,42 @@ public class FilterController extends AbstractController {
             throw new InvalidAccessException("Invalid access!");
         }
         return FILTER_RESULT_JSP;
+    }
+
+    @RequestMapping(value = { "/filter/async/result.htm" }, method = { RequestMethod.GET })
+    public String showAsyncFilterResult(HttpServletRequest request, Model model) {
+        checkReferer(request);
+        if (!model.containsAttribute("asyncSuccess")) {
+            throw new InvalidAccessException("Invalid access!");
+        }
+        return FILTER_ASYNC_RESULT_JSP;
+    }
+
+    @RequestMapping(value = { "/filter/result/{filename:.+}" }, method = { RequestMethod.GET })
+    public ResponseEntity<byte[]> downloadFilterResult(HttpServletRequest request,
+                                                       @PathVariable String filename,
+                                                       Model model) throws IOException {
+        if (StringUtils.isBlank(filename)) {
+            logger.warn("filename is blank!");
+            throw new NotFoundException();
+        }
+        Path filePath = pathUtils.getAbsoluteAnnotationFilesPath().resolve(filename);
+        if (!filePath.toFile().exists()) {
+            logger.warn("file not exists! filename={}", filename);
+            throw new NotFoundException();
+        }
+
+        String mimeType = URLConnection.guessContentTypeFromName(filePath.getFileName().toString());
+        if (mimeType == null) {
+            mimeType = "application/octet-stream";
+            // logger.info("mimetype is not detectable, will take default. mimeType={}", mimeType);
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(mimeType));
+        headers.setContentDispositionFormData("attachment", filePath.getFileName().toString());
+        logger.info("download file! ip={}, filePath={}", getClientIP(request), filePath);
+        return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(filePath.toFile()), headers,
+            HttpStatus.CREATED);
     }
 
     private boolean validateFilterParams(HttpServletRequest request, @Valid FilterForm filterForm,

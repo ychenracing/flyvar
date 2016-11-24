@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,13 +15,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
+import cn.edu.fudan.iipl.flyvar.common.AnnovarUtils;
+import cn.edu.fudan.iipl.flyvar.common.FlyvarFileUtils;
+import cn.edu.fudan.iipl.flyvar.common.PathUtils;
 import cn.edu.fudan.iipl.flyvar.dao.QueryDao;
 import cn.edu.fudan.iipl.flyvar.dao.SampleNameDao;
+import cn.edu.fudan.iipl.flyvar.exception.CombineAnnotateResultException;
 import cn.edu.fudan.iipl.flyvar.model.QueryResultVariation;
 import cn.edu.fudan.iipl.flyvar.model.Variation;
 import cn.edu.fudan.iipl.flyvar.model.VariationRegion;
@@ -29,6 +36,7 @@ import cn.edu.fudan.iipl.flyvar.model.constants.GeneNameType;
 import cn.edu.fudan.iipl.flyvar.model.constants.VariationDataBaseType;
 import cn.edu.fudan.iipl.flyvar.service.AnnotateService;
 import cn.edu.fudan.iipl.flyvar.service.CacheService;
+import cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService;
 import cn.edu.fudan.iipl.flyvar.service.QueryService;
 
 /**
@@ -40,22 +48,34 @@ import cn.edu.fudan.iipl.flyvar.service.QueryService;
 @Service
 public class QueryServiceImpl implements QueryService {
 
-    private static final Logger logger = LoggerFactory.getLogger(QueryServiceImpl.class);
+    private static final Logger     logger = LoggerFactory.getLogger(QueryServiceImpl.class);
 
     @Value("${file.annotationFilesPath}")
-    private String              annotationPath;
+    private String                  annotationPath;
 
     @Autowired
-    private QueryDao            queryDao;
+    private QueryDao                queryDao;
 
     @Autowired
-    private SampleNameDao       sampleNameDao;
+    private SampleNameDao           sampleNameDao;
 
     @Autowired
-    private CacheService        cacheService;
+    private CacheService            cacheService;
 
     @Autowired
-    private AnnotateService     annotateService;
+    private AnnotateService         annotateService;
+
+    @Autowired
+    private ThreadPoolTaskExecutor  taskExecutor;
+
+    @Autowired
+    private AnnovarUtils            annovarUtils;
+
+    @Autowired
+    private FlyvarMailSenderService mailSenderService;
+
+    @Autowired
+    private PathUtils               pathUtils;
 
     private String getExistsCacheKey(Variation variation, String tableName) {
         return Constants.CACHE_VARIATION_EXIST_IN_DB + tableName + "_" + variation.getChr() + "_"
@@ -269,10 +289,71 @@ public class QueryServiceImpl implements QueryService {
     }
 
     @Override
-    public Path annotateResultVariation(Collection<QueryResultVariation> resultVariation) {
-        Path vcfFilePath = annotateService.convertQueryResultVariationsToVcfFile(resultVariation);
+    public Path annotateResultVariation(Collection<QueryResultVariation> resultVariations) {
+        Path vcfFilePath = annotateService.convertQueryResultVariationsToVcfFile(resultVariations);
         Path resultPath = annotateService.annotateVcfFormatVariation(vcfFilePath);
         return resultPath;
+    }
+
+    @Override
+    public void asyncAnnotateAndSendEmail(List<QueryResultVariation> resultVariations,
+                                          String receiver) {
+        taskExecutor.execute(() -> {
+            Path vcfFilePath = annotateService
+                .convertQueryResultVariationsToVcfFile(resultVariations);
+            Path vcfPath = annotateService.annotateVcfFormatVariation(vcfFilePath);
+            Path annovarInputPath = annovarUtils
+                .getAnnovarInputPath(vcfPath.getFileName().toString());
+            Path annotateResultPath = annovarUtils
+                .getAnnotatePath(vcfPath.getFileName().toString());
+            Path exonicAnnotatePath = annovarUtils
+                .getExonicAnnotatePath(vcfPath.getFileName().toString());
+            Path combineAnnovarOutPath = annovarUtils
+                .getCombineAnnovarOutPath(vcfPath.getFileName().toString());
+            Path annovarInvalidInputPath = annovarUtils
+                .getAnnovarInvalidInputPath(vcfPath.getFileName().toString());
+
+            Map<String, Object> emailParams = Maps.newHashMap();
+            emailParams.put("annovarInput", annovarInputPath.getFileName().toString());
+            emailParams.put("annotateResult", annotateResultPath.getFileName().toString());
+            emailParams.put("exonicAnnotateResult", exonicAnnotatePath.getFileName().toString());
+            if (exonicAnnotatePath.toFile().length() > 0) {
+                Path combinedAnnotateResultPath = null;
+                try {
+                    combinedAnnotateResultPath = annotateService
+                        .mergeAnnotateResult(vcfPath.getFileName().toString());
+                    emailParams.put("combinedExonicResult",
+                        combinedAnnotateResultPath.getFileName().toString());
+                } catch (CombineAnnotateResultException ex) {
+                }
+            }
+            emailParams.put("combineAnnovarOut", combineAnnovarOutPath.getFileName().toString());
+            if (annovarInvalidInputPath.toFile().exists()) {
+                emailParams.put("annovarInvalidInput",
+                    annovarInvalidInputPath.getFileName().toString());
+            }
+            mailSenderService.sendAnnotateResults(emailParams, receiver);
+        });
+    }
+
+    @Override
+    public void asyncQueryAndSendEmail(Collection<Variation> variations,
+                                       VariationDataBaseType variationDbType, String receiver) {
+        taskExecutor.execute(() -> {
+            List<QueryResultVariation> resultVariations = queryByVariation(variations,
+                variationDbType);
+            Path queryResultPath = FlyvarFileUtils.writeVariationsToFile(
+                pathUtils.getAbsoluteAnnotationFilesPath(),
+                resultVariations.stream()
+                    .map(resultVariation -> new Variation(resultVariation.getChr(),
+                        resultVariation.getPos(), resultVariation.getRef(),
+                        resultVariation.getAlt()))
+                    .collect(Collectors.toList()));
+            Map<String, Object> emailParams = Maps.newHashMap();
+            emailParams.put("queryResult", queryResultPath.getFileName().toString());
+            mailSenderService.sendQueryResults(emailParams, receiver);
+        });
+
     }
 
 }

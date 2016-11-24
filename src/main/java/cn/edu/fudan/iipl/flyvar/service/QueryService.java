@@ -71,9 +71,27 @@ public interface QueryService {
     /**
      * annotate result variations.
      * 
-     * @param resultVariation
+     * @param resultVariations
      * @return saved file path in vcf format for result variations before annotating.
      */
-    public Path annotateResultVariation(Collection<QueryResultVariation> resultVariation);
+    public Path annotateResultVariation(Collection<QueryResultVariation> resultVariations);
+
+    /**
+     * async query variations and send email to user to download results;
+     * @param variations
+     * @param dbType
+     * @param receiver
+     */
+    public void asyncQueryAndSendEmail(Collection<Variation> variations,
+                                       VariationDataBaseType dbType, String receiver);
+
+    /**
+     * async annotate QueryResultVariation and send email to user to download results;
+     * 
+     * @param resultVariations
+     * @param receiver
+     */
+    public void asyncAnnotateAndSendEmail(List<QueryResultVariation> resultVariations,
+                                          String receiver);
 
 }

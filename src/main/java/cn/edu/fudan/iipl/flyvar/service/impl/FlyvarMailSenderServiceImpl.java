@@ -31,6 +31,10 @@ public class FlyvarMailSenderServiceImpl implements FlyvarMailSenderService {
 
     private static final String ANNOTATION_TEMPLATE     = "mail/annotation.ftl";
 
+    private static final String FILTER_TEMPLATE         = "mail/filter.ftl";
+
+    private static final String QUERY_TEMPLATE          = "mail/query.ftl";
+
     @Autowired
     private MailSenderService   mailSenderService;
 
@@ -62,8 +66,35 @@ public class FlyvarMailSenderServiceImpl implements FlyvarMailSenderService {
      */
     @Override
     public void sendAnnotateResults(Map<String, Object> emailParams, String receiver) {
-        String subject = "Result(s) from FlyVar";
+        String subject = "Annotate result(s) from FlyVar";
         String templateFilePath = ANNOTATION_TEMPLATE;
+        String indexImageFilePath = FLYVAR_INDEX_IMAGE_PATH;
+        Pair<String, String> imagePair = new ImmutablePair<String, String>("flyvar-index",
+            indexImageFilePath);
+        emailParams.put("domain", pathUtils.getDomain());
+        mailSenderService.send(subject, templateFilePath, emailParams, receiver,
+            Arrays.asList(imagePair), null);
+    }
+
+    /* 
+     * @see cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService#sendFilterResults(java.util.Map, java.lang.String)
+     */
+    @Override
+    public void sendFilterResults(Map<String, Object> emailParams, String receiver) {
+        String subject = "Filter result(s) from FlyVar";
+        String templateFilePath = FILTER_TEMPLATE;
+        String indexImageFilePath = FLYVAR_INDEX_IMAGE_PATH;
+        Pair<String, String> imagePair = new ImmutablePair<String, String>("flyvar-index",
+            indexImageFilePath);
+        emailParams.put("domain", pathUtils.getDomain());
+        mailSenderService.send(subject, templateFilePath, emailParams, receiver,
+            Arrays.asList(imagePair), null);
+    }
+
+    @Override
+    public void sendQueryResults(Map<String, Object> emailParams, String receiver) {
+        String subject = "Query result(s) from FlyVar";
+        String templateFilePath = QUERY_TEMPLATE;
         String indexImageFilePath = FLYVAR_INDEX_IMAGE_PATH;
         Pair<String, String> imagePair = new ImmutablePair<String, String>("flyvar-index",
             indexImageFilePath);

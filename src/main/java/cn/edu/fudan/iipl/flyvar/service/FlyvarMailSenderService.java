@@ -20,4 +20,20 @@ public interface FlyvarMailSenderService {
      */
     public void sendAnnotateResults(Map<String, Object> emailParams, String receiver);
 
+    /**
+     * send an email to user with filter results. 
+     * 
+     * @param emailParams
+     * @param receiver
+     */
+    public void sendFilterResults(Map<String, Object> emailParams, String receiver);
+
+    /**
+     * send an email to user with query results. 
+     * 
+     * @param emailParams
+     * @param receiver
+     */
+    public void sendQueryResults(Map<String, Object> emailParams, String receiver);
+
 }
