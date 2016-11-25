@@ -98,7 +98,6 @@
 
 	<bean id="handlerMapping"
 		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
-		<property name="contentNegotiationManager" ref="contentNegotiationManager" />
 		<property name="useRegisteredSuffixPatternMatch" value="true" />
 	</bean>
 
@@ -123,20 +122,6 @@
 				<bean
 					class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter" />
 			</list>
-		</property>
-	</bean>
-
-	<!-- 让Spring管理RequestMapping方法的扩展名。即使用/xxx/{pathvariable} @PathVariable时， 
-		变量不会pathvariable的扩展名（除json和xml外）。 http://stackoverflow.com/questions/16332092/spring-mvc-pathvariable-with-dot-is-getting-truncated -->
-	<bean id="contentNegotiationManager"
-		class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
-		<property name="favorPathExtension" value="false" />
-		<property name="favorParameter" value="true" />
-		<property name="mediaTypes">
-			<value>
-				json=application/json
-				xml=application/xml
-			</value>
 		</property>
 	</bean>
 
