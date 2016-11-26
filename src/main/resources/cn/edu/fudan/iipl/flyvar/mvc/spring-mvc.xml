@@ -21,20 +21,26 @@
 		validator="validator" />
 
 	<!-- 引入属性配置文件 -->
-    <bean id="propertyConfigurer"
-        class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>classpath:cn/edu/fudan/iipl/flyvar/db/jdbc.properties</value>
-                <value>classpath:cn/edu/fudan/iipl/flyvar/db/mongo.properties</value>
-                <value>classpath:cn/edu/fudan/iipl/flyvar/cache/redis.properties</value>
-                <value>classpath:cn/edu/fudan/iipl/flyvar/mail/mail.properties</value>
-                <value>classpath:cn/edu/fudan/iipl/flyvar/file/file.properties</value>
-                <value>classpath:cn/edu/fudan/iipl/flyvar/annovar/annovar.properties</value>
-                <value>classpath:cn/edu/fudan/iipl/flyvar/message/message.properties</value>
-            </list>
-        </property>
-    </bean>
+	<bean id="propertyConfigurer"
+		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/db/jdbc.properties</value>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/db/mongo.properties
+				</value>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/cache/redis.properties
+				</value>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/mail/mail.properties
+				</value>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/file/file.properties
+				</value>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/annovar/annovar.properties
+				</value>
+				<value>classpath:cn/edu/fudan/iipl/flyvar/message/message.properties
+				</value>
+			</list>
+		</property>
+	</bean>
 
 	<!-- 视图解释类 -->
 	<bean name="viewResolver"
@@ -70,10 +76,12 @@
 	<mvc:resources mapping="/static/fonts/**" location="/WEB-INF/static/fonts/"
 		cache-period="31556926" />
 
-	<!--配置上传文件数据解析器 -->
+	<!--配置上传文件数据解析器, this should be replaced by StandardServletMultipartResolver 
+		when using spring security csrf enabled. -->
+	<!-- <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> 
+		<property name="maxUploadSize" value="${file.maxUploadSize}" /> </bean> -->
 	<bean id="multipartResolver"
-		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-		<property name="maxUploadSize" value="${file.maxUploadSize}" />
+		class="org.springframework.web.multipart.support.StandardServletMultipartResolver">
 	</bean>
 
 	<!-- 以下 validator ConversionService 在使用 mvc:annotation-driven 会 自动注册 -->

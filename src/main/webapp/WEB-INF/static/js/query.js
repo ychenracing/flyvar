@@ -33,6 +33,9 @@ function checkInputOrFileSize() {
 			return true;
 		}
 	}
+	if (queryFile.val() === "") {
+		return true;
+	}
 	return false;
 }
 
@@ -46,11 +49,16 @@ function disableVariationDb(disable) {
 }
 
 function getDgrpSamples() {
+	var header = $("meta[name='_csrf_header']").attr("content");
+	var token = $("meta[name='_csrf']").attr("content");
 	$.ajax({
 		url : "query/getDgrpSampleList.json",
 		method : 'POST',
 		data : {},
-		dataType : "json"
+		dataType : "json",
+		beforeSend: function(xhr){
+	        xhr.setRequestHeader(header, token);
+	    }
 	}).done(
 			function(data) {
 				var sampleNameList = data.data;

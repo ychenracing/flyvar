@@ -20,7 +20,6 @@ public class FlyvarSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().anyRequest().permitAll().and().requiresChannel().anyRequest()
-            .requiresSecure();
+        http.authorizeRequests().anyRequest().permitAll();
     }
 }

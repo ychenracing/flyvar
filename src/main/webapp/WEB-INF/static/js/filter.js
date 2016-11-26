@@ -32,6 +32,9 @@ function checkInputOrFileSize() {
 			return true;
 		}
 	}
+	if (filterFile.val() === "") {
+		return true;
+	}
 	return false;
 }
 

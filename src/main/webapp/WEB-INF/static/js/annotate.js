@@ -23,6 +23,9 @@ function checkInputOrFileSize() {
 			return true;
 		}
 	}
+	if (annotateFile.val() === "") {
+		return true;
+	}
 	return false;
 }
 

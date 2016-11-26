@@ -1,5 +1,6 @@
 <meta name="viewport"
 	content="width=device-width, height=device-height, initial-scale=1.0" />
+<sec:csrfMetaTags />
 <link rel="icon" href="static/images/flyvar.ico" type="image/x-icon" />
 <link rel="stylesheet" href="static/css/buttons.css" />
 <link rel="stylesheet" href="static/css/bootstrap.css" />

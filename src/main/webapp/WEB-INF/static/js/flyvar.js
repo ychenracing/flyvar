@@ -5,9 +5,14 @@
 })();
 
 function getVisitTime() {
+	var header = $("meta[name='_csrf_header']").attr("content");
+	var token = $("meta[name='_csrf']").attr("content");
 	$.ajax({
 		url : "visit.json",
 		method : 'POST',
+		beforeSend: function(xhr){
+	        xhr.setRequestHeader(header, token);
+	    }
 	}).done(function(data) {
 		$("#visitTime").html(data.visit);
 	});

@@ -30,6 +30,10 @@
 			<div class="span12 pd90">
 				<div class="table-responsive pd80">
 					<table class="table table-hover">
+					    <thead>
+                            <th class="text-center"></th>
+                            <th class="text-justify text-nowrap">Dispensable genes</th>
+                        </thead>
 						<tbody>
 							<tr>
 								<td class="text-right">gene list:</td>
