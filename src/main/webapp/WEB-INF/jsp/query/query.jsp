@@ -118,6 +118,7 @@
 									data-show-preview="false">
 							</div>
 						</div>
+						<span id="queryInputErrorPrompt" class="error dn"></span>
 						<form:errors path="queryInput" cssClass="error" />
 					</div>
 				</div>

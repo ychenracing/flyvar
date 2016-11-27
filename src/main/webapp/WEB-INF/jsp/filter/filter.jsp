@@ -134,6 +134,7 @@
                                 <form:errors path="filterEmail" cssClass="error" />
                             </div>
                         </div>
+                        <span id="filterInputErrorPrompt" class="error dn"></span>
 						<form:errors path="filterInput" cssClass="error" />
 					</div>
 				</div>

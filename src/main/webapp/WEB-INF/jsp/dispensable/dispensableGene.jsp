@@ -30,22 +30,22 @@
 			<div class="span12 pd90">
 				<div class="table-responsive pd80">
 					<table class="table table-hover">
-					    <thead>
-                            <th class="text-center"></th>
-                            <th class="text-justify text-nowrap">Dispensable genes</th>
-                        </thead>
+						<thead>
+							<th class="text-center"></th>
+							<th class="text-justify text-nowrap">Dispensable genes</th>
+						</thead>
 						<tbody>
 							<tr>
 								<td class="text-right">gene list:</td>
 								<td class="text-justify text-nowrap"><a
-									href="dispensable/dispensible_nonlastANDsharedExon_stopgain_or_frameshift.frameshift">click
-										to download</a></td>
+									href="dispensable/dispensible_nonlastANDsharedExon_stopgain_or_frameshift.frameshift">gene
+										list</a></td>
 							</tr>
 							<tr>
 								<td class="text-right">gene list with annotation:</td>
 								<td class="text-justify text-nowrap"><a
-									href="dispensable/LOF_variants_dispensible_genes.txt">click
-										to download</a></td>
+									href="dispensable/LOF_variants_dispensible_genes.txt">gene
+										list with annotation</a></td>
 							</tr>
 						</tbody>
 					</table>

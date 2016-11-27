@@ -64,7 +64,7 @@
 						<span class="inline-block vc168">input or choose a file</span>
 					</div>
 					<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 pull-right">
-						<div id="div_query_input" class="row">
+						<div id="div_annotate_input" class="row">
 							<form:textarea path="annotateInput" rows="5" id="annotate_input"
 								name="annotate_input" class="form-control" type="text"
 								scrolling="auto" title="Example: chr2L 22025 T G"
@@ -87,6 +87,7 @@
                                 <form:errors path="annotateEmail" cssClass="error" />
                             </div>
                         </div>
+                        <span id="annotateInputErrorPrompt" class="error dn"></span>
 						<form:errors path="annotateInput" cssClass="error" />
 					</div>
 				</div>

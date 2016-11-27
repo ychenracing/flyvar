@@ -53,15 +53,14 @@
 							</c:if>
 
 							<c:if test="${exonicAnnotateResult != null}">
-
-								<tr>
-									<td class="text-right">exonic variant function:</td>
-									<c:if test="${combinedExonicResult == null}">
+								<c:if test="${combinedExonicResult == null}">
+									<tr>
+										<td class="text-right">exonic variant function:</td>
 										<td class="text-justify text-nowrap"><a
 											href="annotate/result/${exonicAnnotateResult}">exonic
 												variant function</a></td>
-									</c:if>
-								</tr>
+									</tr>
+								</c:if>
 							</c:if>
 
 							<c:if test="${combineAnnovarOut != null}">
