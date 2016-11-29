@@ -48,7 +48,7 @@ function checkAnnotateSubmit() {
 			return false;
 		}
 	}
-	if (queryFile === "") {
+	if (annotateFile === "") {
 		var annotateType = $('input:radio[name="inputFormatType"]:checked')
 				.val();
 		switch (annotateType) {
