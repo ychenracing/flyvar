@@ -311,7 +311,7 @@ public class QueryController extends AbstractController {
     public String bySampleResult(HttpServletRequest request, Model model) {
         checkReferer(request);
         if (!model.containsAttribute("success")) {
-            throw new RuntimeException("Invalid access!");
+            throw new InvalidAccessException("Invalid access!");
         }
         return QUERY_BY_SAMPLE_RESULT_JSP;
     }
@@ -364,40 +364,6 @@ public class QueryController extends AbstractController {
             bindings.rejectValue("queryInput", "error.queryInput");
             return false;
         }
-        return true;
-    }
-
-    /**
-     * query by variation processing.
-     * 
-     * @param queryForm
-     * @param bindings
-     * @param queryFile
-     * @param redirectModel
-     * @param model
-     * @return true if processing successfully, false else.
-     */
-    private boolean queryByVariation(@Valid QueryForm queryForm, BindingResult bindings,
-                                     MultipartFile queryFile, RedirectAttributes redirectModel,
-                                     Model model) {
-        String variationStr = queryForm.getQueryInput();
-        if (StringUtils.isBlank(variationStr)) {
-            variationStr = FlyvarFileUtils.readFileToStringDiscardHeader(
-                FlyvarFileUtils.saveUploadFileAndGetFilePath(queryFile,
-                    pathUtils.getAbsoluteUploadFilesPath().toString()));
-        }
-        Set<Variation> variations = Variation.convertInputToVariations(variationStr);
-        if (CollectionUtils.isEmpty(variations)) {
-            model.addAttribute("queryForm", queryForm);
-            bindings.rejectValue("queryInput", "error.queryInputFormat");
-            logger.info("error submit! error format for variation input or file: queryForm={}",
-                queryForm);
-            return false;
-        }
-        List<QueryResultVariation> queryResult = queryService.queryByVariation(variations,
-            VariationDataBaseType.of(queryForm.getVariationDb()));
-        redirectModel.addFlashAttribute("queryResult", queryResult);
-        redirectModel.addFlashAttribute("queryType", queryForm.getVariationDb());
         return true;
     }
 

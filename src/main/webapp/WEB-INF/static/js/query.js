@@ -163,9 +163,19 @@ function setInputFormatError(promptStr) {
 }
 
 function checkBySampleSubmit() {
-	if ($("#select_sample").val() === "") {
+	var selectSample = $("#select_sample").val();
+	var queryEmail = $("#div_input_email");
+	var emailPattern = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+	if (selectSample === "") {
 		$("#queryInputErrorPrompt").removeClass("dn");
-		$("#queryInputErrorPrompt").text("select a sample please!");
+		$("#queryInputErrorPrompt").text("Select a sample please!");
+		return false;
+	}
+	if (queryEmail.val() === "" || !emailPattern.test(queryEmail).val()) {
+		queryEmail.removeClass("dn");
+		queryEmail.focus();
+		$("#queryInputErrorPrompt").removeClass("dn");
+		$("#queryInputErrorPrompt").text("Error format for email!");
 		return false;
 	}
 	return true;
