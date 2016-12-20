@@ -67,8 +67,7 @@ public class SampleNameServiceImpl implements SampleNameService {
         String key = new StringBuilder(Constants.CACHE_SAMPLE_NAME_LIST_FOR_VARIATION)
             .append(variation.getChr()).append("_").append(variation.getPos()).append("_")
             .append(variation.getRef()).append("_").append(variation.getAlt()).toString();
-        // List<String> result = cacheService.get(key);
-        List<String> result = null;
+        List<String> result = cacheService.get(key);
         if (result == null) {
             result = sampleNameDao.getSampleNamesContainTheVariation(variation);
             result.sort((sampleName1, sampleName2) -> {
