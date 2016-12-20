@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -31,8 +29,6 @@ import cn.edu.fudan.iipl.flyvar.service.FlyvarMailSenderService;
 
 @Service
 public class FilterServiceImpl implements FilterService {
-
-    private static final Logger     logger = LoggerFactory.getLogger(FilterServiceImpl.class);
 
     @Autowired
     private CacheService            cacheService;

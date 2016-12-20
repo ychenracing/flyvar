@@ -7,8 +7,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -27,8 +25,6 @@ import cn.edu.fudan.iipl.flyvar.model.Variation;
  */
 @Repository
 public class SampleNameDao {
-
-    private static final Logger logger             = LoggerFactory.getLogger(SampleNameDao.class);
 
     private static final String SELECT_SAMPLE_NAME = "SELECT name FROM sample_name";
 

@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +19,6 @@ import cn.edu.fudan.iipl.flyvar.service.MailSenderService;
 
 @Service
 public class FlyvarMailSenderServiceImpl implements FlyvarMailSenderService {
-
-    private static final Logger logger                  = LoggerFactory
-        .getLogger(FlyvarMailSenderServiceImpl.class);
 
     private static final String FLYVAR_INDEX_IMAGE_PATH = "WEB-INF/static/images/flyvar.png";
 

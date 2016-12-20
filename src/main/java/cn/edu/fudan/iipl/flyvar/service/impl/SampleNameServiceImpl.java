@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +22,6 @@ import cn.edu.fudan.iipl.flyvar.service.SampleNameService;
 
 @Service
 public class SampleNameServiceImpl implements SampleNameService {
-
-    private static final Logger  logger              = LoggerFactory
-        .getLogger(SampleNameServiceImpl.class);
 
     private static final Pattern SAMPLE_NAME_PATTERN = Pattern.compile("\\D+(\\d+)\\D+");
 
@@ -103,8 +98,7 @@ public class SampleNameServiceImpl implements SampleNameService {
         return sampleNames.stream().map(sampleName -> {
             String key = new StringBuilder(Constants.CACHE_SAMPLE_LINK_PAIR_LIST).append(sampleName)
                 .toString();
-            // Object result = cacheService.get(key);
-            Object result = null;
+            Object result = cacheService.get(key);
             if (result == null) {
                 result = sampleNameDao.getSampleLinkNum(sampleName);
                 if (result == null) {

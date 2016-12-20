@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -35,12 +33,13 @@ import cn.edu.fudan.iipl.flyvar.model.constants.VariationDataBaseType;
 @Repository
 public class QueryDao {
 
-    private static final Logger logger                    = LoggerFactory.getLogger(QueryDao.class);
-
     private static final String FLYBASE_ID_TABLE          = "cg_id_convert";
+
     private static final String GENENAME_TABLE            = "dmel_all_r5_12_refgene";
+
     private static final String GENENAME_FLYBASE_ID_TABLE = "fbgn_fbtr";
-    private static final String DISPENSABLE_GENE_TABLE    = "fbgn_fbtr";
+
+    private static final String DISPENSABLE_GENE_TABLE    = "startend";
 
     @Autowired
     @Qualifier("jdbcTemplate")
