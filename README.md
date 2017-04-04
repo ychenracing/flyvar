@@ -1,4 +1,4 @@
-# flyvar#
+# flyvar
 
 FlyVar is a free integrative platform that addresses the increasing need of next generation sequencing data analysis in the Drosophila research community. It is composed of three parts.
 
@@ -17,29 +17,29 @@ FlyVar permits the analysis of next generation sequencing data without the need 
 - **R 3.x+:** flyvar use R to combine annovar results. Exonic variant functions will be combined into variant function results.
 - **Linux or Windows or Mac OSX:** flyvar is platform-independent. It still works fine when you put it on Linux, Windows or Mac OSX or Sierra.
 
-## Build##
+## Build
 
-### Maven###
+### Maven
 
 Use maven to import dependencies and build the project.
 
-### Redis###
+### Redis
 
 flyvar use redis as cache service. Since flyvar database contains huge data for variations, I suggest at least 1GB memory size for redis.
 
-### MongoDB###
+### MongoDB
 
 flyvar use MongoDB to store visit log and visit time.
 
-### MySQL###
+### MySQL
 
 To accelerate data processing, flyvar use MyISAM engine for all data tables. Variation data SQL files will be provided after you send me an email to ask and I argee to offer.
 
-### Tomcat###
+### Tomcat
 
 flyvar use tomcat as http server. Export `flyvar` to `flyvar.war`. Put `flyvar.war` in the folder `webapps`.
 
-## Dependencies##
+## Dependencies
 
 ```xml
 <dependency>
@@ -275,15 +275,15 @@ flyvar use tomcat as http server. Export `flyvar` to `flyvar.war`. Put `flyvar.w
   - more safety
   - cross platforms, run annovar program on any Windows or Unix computer, adapt to all size devices
 
-## Contact##
+## Contact
 
 1. message me at [Yong Chen](https://www.facebook.com/yong.chen.5623293)
 2. send an email to ychenracing@gmail.com
 
-## Reference##
+## Reference
 
 \[1\] [Wang F, Jiang L, Chen Y, et al. FlyVar: a database for genetic variation in Drosophila melanogaster[J]. Database, 2015, 2015: bav079.](https://academic.oup.com/database/article/2433212/FlyVar-a-database-for-genetic-variation-in)
 
-## Copyright##
+## Copyright
 
 Copyright©[fudan.edu](http://www.fudan.edu.cn), [bcm.edu](https://www.bcm.edu/).
