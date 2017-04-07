@@ -25,8 +25,7 @@ public class CacheServiceImpl implements CacheService {
     @SuppressWarnings("unchecked")
     public <T> T get(String key) {
         ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-        Object result = operations.get(key);
-        return (T) result;
+        return (T) operations.get(key);
     }
 
     @Override
@@ -70,7 +69,7 @@ public class CacheServiceImpl implements CacheService {
             redisTemplate.expire(key, expireTime, TimeUnit.SECONDS);
             result = true;
         } catch (Exception e) {
-            e.printStackTrace();
+        	logger.error("set expire value failed!", e);
         }
         return result;
     }

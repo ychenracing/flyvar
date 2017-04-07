@@ -131,6 +131,21 @@
 		<property name="password" value="${redis.password}" />
 		<property name="timeout" value="${redis.timeout}"></property>
 	</bean>
+	<bean id="jedisShardInfo" class="redis.clients.jedis.JedisShardInfo">
+	    <constructor-arg name="host" value="${redis.host}" />
+	    <constructor-arg name="port" value="${redis.port}" />
+	    <constructor-arg name="password" value="${redis.password}" />
+	    <constructor-arg name="timeout" value="${redis.timeout}" />
+	    <constructor-arg name="weight" value="1" />
+	</bean>
+	<bean id="shardedJedisPool" class="redis.clients.jedis.ShardedJedisPool">
+        <constructor-arg index="0" ref="poolConfig" />
+        <constructor-arg index="1">
+            <list>
+                <ref bean="jedisShardInfo" />
+            </list>
+        </constructor-arg>
+    </bean>
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
 		<property name="connectionFactory" ref="connectionFactory" />
 		<property name="keySerializer">
